@@ -1,0 +1,56 @@
+/* You can add global styles to this file, and also import other style files */
+/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
+/* Document
+   ========================================================================== */
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in iOS.
+ */
+ html {
+    line-height: 1.15;
+    /* 1 */
+    -webkit-text-size-adjust: 100%;
+    /* 2 */ }
+  
+  /* Sections
+     ========================================================================== */
+  /**
+   * Remove the margin in all browsers.
+   */
+  body {
+    margin: 0; }
+  
+  /**
+   * Render the `main` element consistently in IE.
+   */
+  main {
+    display: block; }
+  
+  body {
+
+    height: 100vh; /*THis is my change to fix the size of the application*/
+
+    font-family: "Noto Sans", sans-serif;
+    font-size: 100%;
+    background: #fbfbfb; }
+  
+  * {
+    box-sizing: content-box; }
+  
+  .main {
+    margin: 50px auto 110px auto;
+    max-width: 825px;
+    width: 90%;
+    font-size: 14px;
+    font-size: 0.875rem; }
+  
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+  /* Buttons
+     ========================================================================== */
+
+  .app-button{
+    background-color: #333695 !important;
+    color: white;
+  }

@@ -1,0 +1,6 @@
+{
+    "/master":{
+        "target":"http://master:8080",
+        "secure": false
+    }
+}

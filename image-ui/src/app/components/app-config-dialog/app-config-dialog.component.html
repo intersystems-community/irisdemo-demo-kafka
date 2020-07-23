@@ -1,0 +1,83 @@
+<div>
+    <div class="app-config-section-wrapper">
+        <div>
+            <h2 class="config-title-text">General Configuration</h2>
+        </div>
+        <div>
+            <h2 class="config-title-text">Producer</h2>
+        </div>
+    
+        <div>
+            <h2 class="config-title-text">Consumer</h2>
+        </div>
+    </div>
+    <div class="app-config-section-wrapper">
+        <div>
+            <form class="config-form-wrapper" [formGroup]="configFormGroup">
+                <mat-form-field class="form-element">
+                    <input matInput type="number" placeholder="Time to Run in Seconds" formControlName="maxTimeToRunInSeconds">
+                </mat-form-field> 
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Kafka Bootstrap Server Config" formControlName="kafkaBootstrapServersConfig">
+                </mat-form-field> 
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Schema Registry Config" formControlName="schemaRegistryURLConfig">
+                </mat-form-field> 
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Schema" formControlName="schemaVersion">
+                </mat-form-field> 
+    
+            </form>
+        </div>
+        <div>
+            <form class="config-form-wrapper" [formGroup]="configFormGroup">
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="Topic" formControlName="producerTopic">
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput type="number" placeholder="Throttling in between flushes (ms)" formControlName="producerThrottlingInMillis">
+                </mat-form-field>
+
+                <mat-form-field class="form-element">
+                    <input matInput type="number" placeholder="Number of msg per flush" formControlName="producerFlushSize">
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput type="number"placeholder="Threads Per Worker" formControlName="producerThreadsPerWorker">
+                </mat-form-field>                
+            </form>
+        </div>
+        <div>
+            <form class="config-form-wrapper" [formGroup]="configFormGroup">
+                <!-- <mat-form-field class="form-element">
+                    <input matInput placeholder="JDBC URL" formControlName="consumptionJDBCURL">
+                </mat-form-field> 
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="JDBC UserName" formControlName="consumptionJDBCUserName">
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput placeholder="JDBC Password" [type]="hideConsumptionPassword ? 'password' : 'text'" formControlName="consumptionJDBCPassword">
+                    <button mat-icon-button matSuffix (click)="hideConsumptionPassword = !hideConsumptionPassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hideConsumptionPassword">
+                        <mat-icon>{{hideConsumptionPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>  
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput type="number" placeholder="Wait Time Betwwen Queries (ms)" formControlName="consumptionTimeBetweenQueriesInMillis">
+                </mat-form-field>
+                <mat-form-field class="form-element">
+                    <input matInput type="number" placeholder="Num of Keys to Fetch" formControlName="consumptionNumOfKeysToFetch">
+                </mat-form-field>               
+                <mat-form-field class="form-element">
+                    <input matInput type="number" placeholder="Threads Per Worker" formControlName="consumptionNumThreadsPerWorker">
+                </mat-form-field>   -->
+            </form>
+        </div>
+    </div>
+    <div class="dialog-button-wrapper">
+        <div class="button-padder">
+            <button class="app-button" mat-raised-button color="primary" (click)="onNoClick()">Cancel</button>
+        </div>
+        <div class="button-padder">
+            <button [disabled]="!allowConfigUpdate" [class.spinner]="loading" class="app-button" mat-raised-button color="primary" (click)="updateApplicationConfig()">Update Configuration</button>
+        </div>
+    </div>
+</div>

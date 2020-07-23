@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ./buildtools.sh
+
+push_images
