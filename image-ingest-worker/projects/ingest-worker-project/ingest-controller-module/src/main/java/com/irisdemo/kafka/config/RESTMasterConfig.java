@@ -11,7 +11,7 @@ public class RESTMasterConfig
 	*/
 	public String kafkaBootstrapServersConfig;
 	public String schemaRegistryURLConfig;
-	public String schemaVersion;
+	public String avroSchema;
 
 	/* 
 	PRODUCER CONFIGURATION 

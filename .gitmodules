@@ -1,0 +1,3 @@
+[submodule "image-ingest-worker/projects/ingest-worker-project/irisdemo-base-banksim"]
+	path = image-ingest-worker/projects/ingest-worker-project/irisdemo-base-banksim
+	url = https://github.com/intersystems-community/irisdemo-base-banksim

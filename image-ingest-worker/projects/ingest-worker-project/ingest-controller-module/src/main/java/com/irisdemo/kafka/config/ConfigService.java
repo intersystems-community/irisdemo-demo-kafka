@@ -57,7 +57,7 @@ public class ConfigService implements ApplicationListener<ServletWebServerInitia
 				RESTWorkerConfig workerConfig = restTemplate.getForObject(registrationUrl, RESTWorkerConfig.class);
 
 				config.setWorkerNodePrefix(workerConfig.workerNodePrefix);
-				config.setSchemaVersion(workerConfig.config.schemaVersion);
+				config.setAvroSchema(workerConfig.config.avroSchema);
 
 				config.setKafkaBootstrapServersConfig(workerConfig.config.kafkaBootstrapServersConfig);
 				config.setSchemaRegistryURLConfig(workerConfig.config.schemaRegistryURLConfig);

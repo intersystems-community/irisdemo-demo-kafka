@@ -29,7 +29,7 @@ public class Config
 	*/
 	private String kafkaBootstrapServersConfig;
 	private String schemaRegistryURLConfig;
-	private String schemaVersion;
+	private String avroSchema;
 
 	/* 
 	PRODUCER CONFIGURATION 
@@ -132,15 +132,15 @@ public class Config
 		return kafkaBootstrapServersConfig;
 	}
 
-	public void setSchemaVersion(String schemaVersion)
+	public void setAvroSchema(String avroSchema)
 	{
-		logger.info("Got schema version = " + schemaVersion);
-		this.schemaVersion = schemaVersion;
+		logger.info("Got avro schema = " + avroSchema);
+		this.avroSchema = avroSchema;
 	}
 
-	public String getSchemaVersion()
+	public String getAvroSchema()
 	{
-		return schemaVersion;
+		return avroSchema;
 	}
 	
 	public void setProducerTopic(String producerTopic)

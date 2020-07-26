@@ -9,7 +9,7 @@
 	</parent>
 
 	<groupId>com.irisdemo.kafka</groupId>
-	<artifactId>kafka-ingest-worker</artifactId>
+	<artifactId>payment-kafka-ingest-worker</artifactId>
 	<version>1.0.0</version>
 	<name>kafka-ingest-worker</name>
 	<packaging>jar</packaging>
@@ -51,6 +51,19 @@
 			<version>${confluent-ccs.version}</version>
 		</dependency>
 
+		<!-- <dependency>
+			<groupId>io.confluent</groupId>
+			<artifactId>kafka-schema-registry</artifactId>
+			<version>${confluent.version}</version>
+			<exclusions>
+				<exclusion> 
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+
+				</exclusion>
+			</exclusions> 
+		</dependency> -->
+
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
@@ -63,17 +76,10 @@
 			<version>${avro.version}</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>io.confluent</groupId>
 			<artifactId>kafka-streams-avro-serde</artifactId>
 			<version>${confluent.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>${gson.version}</version>
 		</dependency>
 
 		<!-- <dependency>
@@ -93,7 +99,7 @@
 					<executable>true</executable>
 					<archive>
 						<manifest>
-							<mainClass>com.irisdemo.htap.App</mainClass>
+							<mainClass>com.irisdemo.kafka.App</mainClass>
 							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>

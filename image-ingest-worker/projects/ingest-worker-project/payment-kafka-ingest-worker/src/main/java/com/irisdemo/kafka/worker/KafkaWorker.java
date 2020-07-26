@@ -23,17 +23,20 @@ import com.irisdemo.kafka.workersrv.IWorker;
 import com.irisdemo.kafka.workersrv.WorkerMetricsAccumulator;
 import com.irisdemo.kafka.workersrv.WorkerSemaphore;
 
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.common.errors.SerializationException;
 
-import io.confluent.examples.clients.basicavro.Payment;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 
 import java.util.Properties;
+import java.util.Collections;
+
+import io.confluent.examples.clients.basicavro.Payment;
 
 @Component("worker")
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -54,7 +57,7 @@ public class KafkaWorker implements IWorker
 	protected RandomDataGenerator randomDataGenerator;
 	
 	protected KafkaProducer<String, Payment> producer = null;
-
+	protected String topic;
 	protected static char[] prefixes = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
 	public void closeKafkaProducer() throws Exception
@@ -72,8 +75,11 @@ public class KafkaWorker implements IWorker
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
 		props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.getSchemaRegistryURLConfig());
-		
+		props.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, true);
+
 		producer = new KafkaProducer<String, Payment>(props);
+
+		this.topic = config.getProducerTopic();
 	}
 
 	@Async("workerExecutor")
@@ -87,13 +93,10 @@ public class KafkaWorker implements IWorker
 
 		accumulatedMetrics.incrementNumberOfActiveIngestionThreads();
 
-		String topic = config.getProducerTopic();
-
-		logger.info("Ingestion worker #"+threadNum+" started. Sending messages to topic " + topic);
+		logger.info("Ingestion worker #"+threadNum+" started. Sending messages to topic " + this.topic);
 
 		randomDataGenerator.initializeRandomMapping();
 
-		String schema = config.getSchemaVersion();
 		try
 		{
 			int currentRecord = 0;
@@ -144,7 +147,6 @@ public class KafkaWorker implements IWorker
 		catch(Exception e)
 		{
 			logger.error("Ingestion worker #"+threadNum+" crashed with the following error:" + e.getMessage());
-			logger.error("Schema Value is " + schema);
 		}
 
 		accumulatedMetrics.decrementNumberOfActiveIngestionThreads();

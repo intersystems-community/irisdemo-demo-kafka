@@ -342,7 +342,7 @@ public class AppController {
         /* General settings */
         config.setKafkaBootstrapServersConfig(newConfig.getKafkaBootstrapServersConfig());
         config.setSchemaRegistryURLConfig(newConfig.getSchemaRegistryURLConfig());
-        config.setSchemaVersion(newConfig.getSchemaVersion());
+        config.setAvroSchema(newConfig.getAvroSchema());
 
         /* Ingestion Settings */
         config.setProducerThrottlingInMillis(newConfig.getProducerThrottlingInMillis());

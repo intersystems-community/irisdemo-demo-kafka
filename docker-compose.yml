@@ -36,7 +36,7 @@ services:
       - PRODUCER_TOPIC=transactions
       - KAFKA_BOOTSTRAP_SERVERS_CONFIG=http://broker:29092
       - KAFKA_SCHEMA_REGISTRY_URL_CONFIG=http://schema-registry:8081
-      - SCHEMA_VERSION=v1
+      - AVRO_SCHEMA=/avro/io/confluent/examples/clients/basicavro/Payment.asvc
   
   ui:
     depends_on:
@@ -54,13 +54,13 @@ services:
     container_name: ingest-worker1
     hostname: ingest-worker1
     init: true
-    image: intersystemsdc/irisdemo-demo-kafka:kafka-ingest-worker-version-1.1.1
+    image: intersystemsdc/irisdemo-demo-kafka:banksim-kafka-ingest-worker-version-1.1.1
+    # image: intersystemsdc/irisdemo-demo-kafka:payment-kafka-ingest-worker-version-1.1.1
     ports:
       - "10003:8080" # Where Springboot Will be listening
     environment:
       - MASTER_HOSTNAME=master
       - MASTER_PORT=8080
-
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.1

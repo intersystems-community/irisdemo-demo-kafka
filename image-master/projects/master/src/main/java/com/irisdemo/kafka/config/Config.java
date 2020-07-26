@@ -25,7 +25,7 @@ public class Config
 	private int numberOfActiveIngestionThreads;
 	private String kafkaBootstrapServersConfig;
 	private String schemaRegistryURLConfig;
-	private String schemaVersion;
+	private String avroSchema;
 
 	/* 
 	PRODUCER CONFIGURATION 
@@ -164,14 +164,14 @@ public class Config
 		this.kafkaBootstrapServersConfig = kafkaBootstrapServersConfig;
 	}
 
-	public String getSchemaVersion() {
-		return schemaVersion;
+	public String getAvroSchema() {
+		return avroSchema;
 	}
 
-	@Value( "${SCHEMA_VERSION}" )
-	public void setSchemaVersion(String ingestionRESTSchemaVersion) {
-		logger.info("Setting SCHEMA_VERSION = " + schemaVersion);
-		this.schemaVersion = schemaVersion;
+	@Value( "${AVRO_SCHEMA}" )
+	public void setAvroSchema(String avroSchema) {
+		logger.info("Setting Avro Schema = " + avroSchema);
+		this.avroSchema = avroSchema;
 	}
 
 	public String getConsumptionJDBCURL() {

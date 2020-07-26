@@ -18,6 +18,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+		<avro.version>1.9.2</avro.version>
 	</properties>  
 
 	<dependencies>
@@ -38,7 +39,9 @@
   
   	<modules>
 		<module>ingest-controller-module</module>
-		<module>kafka-ingest-worker</module>		
+		<module>payment-kafka-ingest-worker</module>		
+		<module>banksim-kafka-ingest-worker</module>		
+		<module>irisdemo-base-banksim</module>		
 	</modules>
   
     <build>
@@ -52,9 +55,10 @@
 						<target>1.8</target> 
 					</configuration>
                 </plugin>
-					
+
 			</plugins>
 		</pluginManagement>
     </build>
     
+
 </project>

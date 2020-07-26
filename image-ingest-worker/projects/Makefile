@@ -9,5 +9,6 @@ build:
 
 	# Add a cp command here for each type of worker that has been created. 
 	# We are eliminating the version number.
-	cp /usr/projects/ingest-worker-project/kafka-ingest-worker/target/kafka-ingest-worker-*.jar /usr/projects/kafka-ingest-worker.jar
+	cp /usr/projects/ingest-worker-project/payment-kafka-ingest-worker/target/payment-kafka-ingest-worker-*.jar /usr/projects/payment-kafka-ingest-worker.jar
+	cp /usr/projects/ingest-worker-project/banksim-kafka-ingest-worker/target/banksim-kafka-ingest-worker-*.jar /usr/projects/banksim-kafka-ingest-worker.jar
 	
