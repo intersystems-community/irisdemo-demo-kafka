@@ -25,7 +25,6 @@ public class Config
 	private int numberOfActiveIngestionThreads;
 	private String kafkaBootstrapServersConfig;
 	private String schemaRegistryURLConfig;
-	private String avroSchema;
 
 	/* 
 	PRODUCER CONFIGURATION 
@@ -33,7 +32,9 @@ public class Config
 	private int producerFlushSize;
 	private int producerThreadsPerWorker;
 	private long producerThrottlingInMillis;
-	private String producerTopic;
+	private int bankSimDays;
+	private int bankSimNumEvents;
+	private int bankSimNumCustomers;
 
 	/* 
 	CONSUMPTION CONFIGURATION 
@@ -122,18 +123,38 @@ public class Config
 		producerFlushSize=value;
 	}
 
-	public String getProducerTopic() 
-	{
-		return producerTopic;
+	@Value( "${BANKSIM_NUM_DAYS:30}" )
+	public void setBankSimDays(int bankSimDays) {
+		logger.info("Setting Bank Simulation Number of Days = " + bankSimDays);
+		this.bankSimDays = bankSimDays;
 	}
 
-	@Value( "${PRODUCER_TOPIC:10}" )
-	public void setProducerTopic(String value) 
+	public int getBankSimDays() 
 	{
-		logger.info("Setting producer topic = " + value);
-		producerTopic=value;
+		return bankSimDays;
 	}
 
+	@Value( "${BANKSIM_NUM_EVENTS:5000000}" )
+	public void setBankSimNumEvents(int bankSimNumEvents) {
+		logger.info("Setting Bank Simulation Number of Events = " + bankSimNumEvents);
+		this.bankSimNumEvents = bankSimNumEvents;
+	}
+
+	public int getBankSimNumEvents() 
+	{
+		return bankSimNumEvents;
+	}
+
+	@Value( "${BANKSIM_NUM_CUSTOMERS:10000}" )
+	public void setBankSimNumCustomers(int bankSimNumCustomers) {
+		logger.info("Setting Bank Simulation Number of Customers = " + bankSimNumCustomers);
+		this.bankSimNumCustomers = bankSimNumCustomers;
+	}
+
+	public int getBankSimNumCustomers() 
+	{
+		return bankSimNumCustomers;
+	}
 	public boolean getStartConsumers() {
 		return startConsumers;
 	}
@@ -162,16 +183,6 @@ public class Config
 	public void setKafkaBootstrapServersConfig(String kafkaBootstrapServersConfig) {
 		logger.info("Setting KAFKA_BOOTSTRAP_SERVERS_CONFIG = " + kafkaBootstrapServersConfig);
 		this.kafkaBootstrapServersConfig = kafkaBootstrapServersConfig;
-	}
-
-	public String getAvroSchema() {
-		return avroSchema;
-	}
-
-	@Value( "${AVRO_SCHEMA}" )
-	public void setAvroSchema(String avroSchema) {
-		logger.info("Setting Avro Schema = " + avroSchema);
-		this.avroSchema = avroSchema;
 	}
 
 	public String getConsumptionJDBCURL() {

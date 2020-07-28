@@ -11,8 +11,8 @@ rm -f ./images_built
 ###############################################################
 # IRIS Data Sink Image
 ###############################################################
-# UI_IMAGE_NAME=intersystemsdc/irisdemo-demo-kafka:iris-data-sink-${DOCKER_TAG}
-# docker build -t $UI_IMAGE_NAME ./image-iris-data-sink
+# UI_IMAGE_NAME=intersystemsdc/irisdemo-demo-kafka:iris-datasource-${DOCKER_TAG}
+# docker build -t $UI_IMAGE_NAME ./image-iris-datasource
 # # This  image was not built with the function build_java_project(). So we will
 # # add the full image name ourselves.
 # echo $UI_IMAGE_NAME >> ./images_built

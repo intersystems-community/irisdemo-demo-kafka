@@ -61,11 +61,14 @@ public class ConfigService implements ApplicationListener<ServletWebServerInitia
 
 				config.setKafkaBootstrapServersConfig(workerConfig.config.kafkaBootstrapServersConfig);
 				config.setSchemaRegistryURLConfig(workerConfig.config.schemaRegistryURLConfig);
-				config.setProducerTopic(workerConfig.config.producerTopic);
 				
 				config.setProducerFlushSize(workerConfig.config.producerFlushSize);
 				config.setProducerThreadsPerWorker(workerConfig.config.producerThreadsPerWorker);
 				config.setProducerThrottlingInMillis(workerConfig.config.producerThrottlingInMillis);
+
+				config.setBankSimDays(workerConfig.config.bankSimDays);
+				config.setBankSimNumEvents(workerConfig.config.bankSimNumEvents);
+				config.setBankSimNumCustomers(workerConfig.config.bankSimNumCustomers);
 				
 				logger.info("Registration successful. Configuration data received and stored.");
 

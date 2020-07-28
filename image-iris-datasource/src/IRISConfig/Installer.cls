@@ -48,6 +48,25 @@ ClassMethod LoadUSStates(pNamespace As %String) As %Status
 	Quit tSC
 }
 
+ClassMethod ConfigSchemaRegistry(pNamespace As %String, pSchemaRegistryURL As %String) As %Status
+{
+	Set tSC = $$$OK
+	Try
+	{
+		ZN "APPINT"
+		
+		Set tSC = ##class(SchemaRegistry.Config).Create("ConfluentKafka",pSchemaRegistryURL,"Confluent")
+
+	}
+	Catch (oException)
+	{
+		Set tSC = oException.AsStatus()
+	}	
+	
+	ZN "%SYS"
+	
+	Quit tSC
+}
 
 /// You can customize this to run code during docker build
 XData Install [ XMLNamespace = INSTALLER ]
@@ -77,6 +96,11 @@ XData Install [ XMLNamespace = INSTALLER ]
 		<Arg name="pRoleName" Value="Application Specialist"/>
 	</Invoke>
 	
+	<Invoke Class="IRISConfig.Installer" Method="ConfigSchemaRegistry" CheckStatus="true">
+		<Arg name="pNamespace" Value="${Namespace}"/>
+		<Arg name="SchemaRegistryURL" Value="http://schema-registry:8081"/>
+	</Invoke>
 </Manifest>
 }
+
 }

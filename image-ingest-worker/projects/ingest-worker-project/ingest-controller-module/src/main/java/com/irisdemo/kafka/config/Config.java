@@ -38,8 +38,10 @@ public class Config
 	private int producerThreadsPerWorker;
 	private long producerThrottlingInMillis;
 	private String producerTopic;
-	
-	
+	private int bankSimDays;
+	private int bankSimNumEvents;
+	private int bankSimNumCustomers;
+		
 	public void setProducerThrottlingInMillis(long producerThrottlingInMillis)
 	{
 		this.producerThrottlingInMillis=producerThrottlingInMillis;
@@ -110,6 +112,37 @@ public class Config
 		this.producerThreadsPerWorker=value;
 	}
 
+	public void setBankSimDays(int bankSimDays) {
+		logger.info("Setting Bank Simulation Number of Days = " + bankSimDays);
+		this.bankSimDays = bankSimDays;
+	}
+
+	public int getBankSimDays() 
+	{
+		return bankSimDays;
+	}
+
+	public void setBankSimNumEvents(int bankSimNumEvents) {
+		logger.info("Setting Bank Simulation Number of Events = " + bankSimNumEvents);
+		this.bankSimNumEvents = bankSimNumEvents;
+	}
+
+	public int getBankSimNumEvents() 
+	{
+		return bankSimNumEvents;
+	}
+
+	public void setBankSimNumCustomers(int bankSimNumCustomers) {
+		logger.info("Setting Bank Simulation Number of Customers = " + bankSimNumCustomers);
+		this.bankSimNumCustomers = bankSimNumCustomers;
+	}
+
+	public int getBankSimNumCustomers() 
+	{
+		return bankSimNumCustomers;
+	}
+
+
 	public void setSchemaRegistryURLConfig(String schemaRegistryURLConfig)
 	{
 		logger.info("Got Kafka schema registry = " + schemaRegistryURLConfig);
@@ -143,17 +176,6 @@ public class Config
 		return avroSchema;
 	}
 	
-	public void setProducerTopic(String producerTopic)
-	{
-		logger.info("Got producer topic = " + producerTopic);
-		this.producerTopic = producerTopic;
-	}
-
-	public String getProducerTopic()
-	{
-		return producerTopic;
-	}
-
 	public int getProducerFlushSize() 
 	{
 		return producerFlushSize;

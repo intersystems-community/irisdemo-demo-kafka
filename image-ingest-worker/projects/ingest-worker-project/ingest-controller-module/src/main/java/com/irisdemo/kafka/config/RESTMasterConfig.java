@@ -19,6 +19,9 @@ public class RESTMasterConfig
 	public int producerFlushSize;
 	public int producerThreadsPerWorker;
 	public long producerThrottlingInMillis;
-	public String producerTopic;
+	public int bankSimDays;
+	public int bankSimNumEvents;
+	public int bankSimNumCustomers;
+
 
 }

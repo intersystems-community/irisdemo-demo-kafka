@@ -342,14 +342,15 @@ public class AppController {
         /* General settings */
         config.setKafkaBootstrapServersConfig(newConfig.getKafkaBootstrapServersConfig());
         config.setSchemaRegistryURLConfig(newConfig.getSchemaRegistryURLConfig());
-        config.setAvroSchema(newConfig.getAvroSchema());
 
         /* Ingestion Settings */
         config.setProducerThrottlingInMillis(newConfig.getProducerThrottlingInMillis());
         config.setProducerThreadsPerWorker(newConfig.getProducerThreadsPerWorker());
         config.setProducerFlushSize(newConfig.getProducerFlushSize());
-        config.setProducerTopic(newConfig.getProducerTopic());
-        
+        config.setBankSimDays(newConfig.getBankSimDays());
+        config.setBankSimNumEvents(newConfig.getBankSimNumEvents());
+        config.setBankSimNumCustomers(newConfig.getBankSimNumCustomers());
+    
         /*Consumption Setings*/
         /*
         config.setConsumptionNumThreadsPerWorker(newConfig.getConsumptionNumThreadsPerWorker());

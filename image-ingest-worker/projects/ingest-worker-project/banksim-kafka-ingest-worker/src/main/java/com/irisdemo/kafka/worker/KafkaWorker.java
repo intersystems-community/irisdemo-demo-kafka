@@ -34,7 +34,6 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer;
 
 import com.irisdemo.banksim.avroevent.*;
 import com.irisdemo.banksim.Simulator;
-import com.irisdemo.banksim.event.Event;
 import org.apache.avro.specific.*;
 
 
@@ -58,9 +57,7 @@ public class KafkaWorker implements IWorker
     	
 	//protected KafkaProducer<LongSerializer, KafkaAvroSerializer> producer = null;
 	
-	protected KafkaProducer<Long, com.irisdemo.banksim.avroevent.TransferEvent> transfersProducer = null;
-	protected KafkaProducer<Long, com.irisdemo.banksim.avroevent.DemographicsEvent> demographicsProducer = null;
-	protected KafkaProducer<Long, com.irisdemo.banksim.avroevent.LoanContractEvent> loanContractsProducer = null;
+	protected KafkaProducer producer = null;
 
 	protected final String transferTopic = "transfers";
 	protected final String demographicsTopic = "customer_demographics";
@@ -70,44 +67,20 @@ public class KafkaWorker implements IWorker
 
 	public void closeKafkaProducer() throws Exception
 	{
-		transfersProducer.close();
-		demographicsProducer.close();
-		loanContractsProducer.close();
-		transfersProducer=null;
-		demographicsProducer=null;
-		loanContractsProducer=null;
-
+		producer.close();
+		producer = null;
 	}
 
 	public void initiateKafkaProducer() throws Exception
 	{
-		final Properties transfersProducerProps = new Properties();
-        transfersProducerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getKafkaBootstrapServersConfig());
-        transfersProducerProps.put(ProducerConfig.ACKS_CONFIG, "all");
-        transfersProducerProps.put(ProducerConfig.RETRIES_CONFIG, 0);
-        transfersProducerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
-		transfersProducerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
-		transfersProducerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.getSchemaRegistryURLConfig());
-		this.transfersProducer = new KafkaProducer<Long, com.irisdemo.banksim.avroevent.TransferEvent>(transfersProducerProps);
-
-		final Properties customerDemographicsProducerProps = new Properties();
-        customerDemographicsProducerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getKafkaBootstrapServersConfig());
-        customerDemographicsProducerProps.put(ProducerConfig.ACKS_CONFIG, "all");
-        customerDemographicsProducerProps.put(ProducerConfig.RETRIES_CONFIG, 0);
-        customerDemographicsProducerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
-		customerDemographicsProducerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
-		customerDemographicsProducerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.getSchemaRegistryURLConfig());
-		this.demographicsProducer = new KafkaProducer<Long, com.irisdemo.banksim.avroevent.DemographicsEvent>(customerDemographicsProducerProps);
-
-		final Properties loanContractsProducerProps = new Properties();
-        loanContractsProducerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getKafkaBootstrapServersConfig());
-        loanContractsProducerProps.put(ProducerConfig.ACKS_CONFIG, "all");
-        loanContractsProducerProps.put(ProducerConfig.RETRIES_CONFIG, 0);
-        loanContractsProducerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
-		loanContractsProducerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
-		loanContractsProducerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.getSchemaRegistryURLConfig());
-		this.loanContractsProducer = new KafkaProducer<Long, com.irisdemo.banksim.avroevent.LoanContractEvent>(loanContractsProducerProps);
-		
+		final Properties props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getKafkaBootstrapServersConfig());
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.RETRIES_CONFIG, 0);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
+		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
+		props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.getSchemaRegistryURLConfig());
+		this.producer = new KafkaProducer(props);
 	}
 
 	@Async("workerExecutor")
@@ -116,15 +89,11 @@ public class KafkaWorker implements IWorker
 		long recordNum = 0;
 		long batchSizeInBytes;
 
-		Event event = null;
-		SpecificRecordBase avroEvent;
-		
-		//ProducerRecord<Long,SpecificRecordBase> record = null;
-		
-		ProducerRecord<Long, com.irisdemo.banksim.avroevent.TransferEvent> transfersRecord = null;
-		ProducerRecord<Long, com.irisdemo.banksim.avroevent.DemographicsEvent> demographicsRecord = null;
-		ProducerRecord<Long, com.irisdemo.banksim.avroevent.LoanContractEvent> loanContractsRecord = null;
-		
+		SpecificRecordBase avroEvent = null;
+				
+		ProducerRecord<Long, TransferAvroEvent> transfersRecord = null;
+		ProducerRecord<Long, DemographicsAvroEvent> demographicsRecord = null;
+		ProducerRecord<Long, LoanContractAvroEvent> loanContractsRecord = null;
 
 		long producerThrottlingInMillis = config.getProducerThrottlingInMillis();
 
@@ -133,7 +102,8 @@ public class KafkaWorker implements IWorker
 		logger.info("Ingestion worker #"+threadNum+" started. Sending messages to topics... ");
 
 		// amountDays, amountEvents, amountCustomers
-		Simulator simulator = new Simulator(30, 5000000, 50000);
+		Simulator simulator = new Simulator(config.getBankSimDays(), config.getBankSimNumEvents(), config.getBankSimNumCustomers());
+		//Simulator simulator = new Simulator(30, 5000000, 50000);
 		
 		try
 		{
@@ -151,27 +121,26 @@ public class KafkaWorker implements IWorker
 	    				break;
 
 					//randomDataGenerator.populateJSONRequest(requestJSON, threadPrefix, schema, ++currentRecord);
-					event = simulator.next();
-					avroEvent = event.getAvroEvent();
+					avroEvent = simulator.nextAvroEvent();
 
-					if (event == null) 
+					if (avroEvent == null) 
 					{
 						break;
 					}
-					else if (avroEvent instanceof com.irisdemo.banksim.avroevent.TransferEvent)
+					else if (avroEvent instanceof TransferAvroEvent)
 					{
-						transfersRecord = new ProducerRecord<Long, com.irisdemo.banksim.avroevent.TransferEvent>(transferTopic, Long.valueOf(event.getId()), (com.irisdemo.banksim.avroevent.TransferEvent)avroEvent);
-						transfersProducer.send(transfersRecord);
+						transfersRecord = new ProducerRecord<Long, TransferAvroEvent>(transferTopic, (Long)avroEvent.get("id"), (TransferAvroEvent)avroEvent);
+						producer.send(transfersRecord);
 					}
-					else if (avroEvent instanceof com.irisdemo.banksim.avroevent.DemographicsEvent)
+					else if (avroEvent instanceof DemographicsAvroEvent)
 					{
-						demographicsRecord = new ProducerRecord<Long, com.irisdemo.banksim.avroevent.DemographicsEvent>(demographicsTopic, Long.valueOf(event.getId()), (com.irisdemo.banksim.avroevent.DemographicsEvent)avroEvent);
-						demographicsProducer.send(demographicsRecord);
+						demographicsRecord = new ProducerRecord<Long, DemographicsAvroEvent>(demographicsTopic, (Long)avroEvent.get("id"), (DemographicsAvroEvent)avroEvent);
+						producer.send(demographicsRecord);
 					}
-					else if (avroEvent instanceof com.irisdemo.banksim.avroevent.LoanContractEvent)
+					else if (avroEvent instanceof LoanContractAvroEvent)
 					{
-						loanContractsRecord = new ProducerRecord<Long, com.irisdemo.banksim.avroevent.LoanContractEvent>(loanContractsTopic, Long.valueOf(event.getId()), (com.irisdemo.banksim.avroevent.LoanContractEvent)avroEvent);
-						loanContractsProducer.send(loanContractsRecord);
+						loanContractsRecord = new ProducerRecord<Long, LoanContractAvroEvent>(loanContractsTopic, (Long)avroEvent.get("id"), (LoanContractAvroEvent)avroEvent);
+						producer.send(loanContractsRecord);
 					}
 					
 					currentBatchSize++;
@@ -179,18 +148,14 @@ public class KafkaWorker implements IWorker
 				
 				if(workerSemaphore.green())
 				{
-					// Not really caring too much about the fact that there may be producers with fewer records than others. Just flushing everyting.
-					transfersProducer.flush();
-					demographicsProducer.flush();
-					loanContractsProducer.flush();
-
+					producer.flush();
 					accumulatedMetrics.addToStats(currentBatchSize, batchSizeInBytes);
 
 					if (producerThrottlingInMillis>0)
 						Thread.sleep(producerThrottlingInMillis);
 				}
 
-				if (event == null) break;
+				if (avroEvent == null) break;
 			}
 
 		}

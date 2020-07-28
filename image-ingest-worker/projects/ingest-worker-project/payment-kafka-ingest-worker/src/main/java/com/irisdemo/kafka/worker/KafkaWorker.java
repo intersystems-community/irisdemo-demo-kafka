@@ -79,7 +79,7 @@ public class KafkaWorker implements IWorker
 
 		producer = new KafkaProducer<String, Payment>(props);
 
-		this.topic = config.getProducerTopic();
+		this.topic = "transactions";
 	}
 
 	@Async("workerExecutor")
