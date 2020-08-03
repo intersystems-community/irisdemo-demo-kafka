@@ -9,9 +9,5 @@ build:
 
 	# Add a cp command here for each type of worker that has been created. 
 	# We are eliminating the version number.
-	cp /usr/projects/query-worker-project/iris-jdbc-query-worker/target/iris-jdbc-query-worker-*.jar /usr/projects/iris-jdbc-query-worker.jar
-	cp /usr/projects/query-worker-project/mysql-jdbc-query-worker/target/mysql-jdbc-query-worker-*.jar /usr/projects/mysql-jdbc-query-worker.jar
-	cp /usr/projects/query-worker-project/hana-jdbc-query-worker/target/hana-jdbc-query-worker-*.jar /usr/projects/hana-jdbc-query-worker.jar
-	cp /usr/projects/query-worker-project/mssqlserver-jdbc-query-worker/target/mssqlserver-jdbc-query-worker-*.jar /usr/projects/mssqlserver-jdbc-query-worker.jar
-	cp /usr/projects/query-worker-project/sybasease-jdbc-query-worker/target/sybasease-jdbc-query-worker-*.jar /usr/projects/sybasease-jdbc-query-worker.jar
+	cp /usr/projects/query-worker-project/banksim-kafka-consumer-worker/target/banksim-kafka-consumer-worker-*.jar /usr/projects/banksim-kafka-consumer-worker.jar
 	

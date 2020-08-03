@@ -11,35 +11,35 @@ rm -f ./images_built
 ###############################################################
 # IRIS Data Sink Image
 ###############################################################
-# UI_IMAGE_NAME=intersystemsdc/irisdemo-demo-kafka:iris-datasource-${DOCKER_TAG}
+#UI_IMAGE_NAME=intersystemsdc/irisdemo-demo-kafka:iris-datasource-${DOCKER_TAG}
 # docker build -t $UI_IMAGE_NAME ./image-iris-datasource
 # # This  image was not built with the function build_java_project(). So we will
 # # add the full image name ourselves.
-# echo $UI_IMAGE_NAME >> ./images_built
+#echo $UI_IMAGE_NAME >> ./images_built
 
 ###############################################################
 # Master Image
 ###############################################################
-# build_java_project "image-master"
+#build_java_project "image-master"
 
 ###############################################################
 # Ingestion Worker Images
 ###############################################################
-build_java_project "image-ingest-worker"
+#build_java_project "image-ingest-worker"
 
 ###############################################################
 # Query Worker Images
 ###############################################################
-# build_java_project "image-query-worker"
+build_java_project "image-query-worker"
 
 ###############################################################
 # UI Image
 ###############################################################
-# UI_IMAGE_NAME=intersystemsdc/irisdemo-demo-kafka:ui-${DOCKER_TAG}
-# docker build -t $UI_IMAGE_NAME ./image-ui
+#UI_IMAGE_NAME=intersystemsdc/irisdemo-demo-kafka:ui-${DOCKER_TAG}
+#docker build -t $UI_IMAGE_NAME ./image-ui
 # # This  image was not built with the function build_java_project(). So we will
 # # add the full image name ourselves.
-# echo $UI_IMAGE_NAME >> ./images_built
+#echo $UI_IMAGE_NAME >> ./images_built
 
 
 # It is necessary to build the application this way as well so it can be run standalone, without dockers.

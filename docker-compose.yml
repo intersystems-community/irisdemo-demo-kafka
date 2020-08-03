@@ -23,7 +23,7 @@ services:
       - "10002:8080" # Where Springboot Will be listening
     environment:
       - MASTER_SPEEDTEST_TITLE=InterSystems IRIS Kafka Demo with AVRO and Schema Evolution
-      - START_CONSUMERS=false
+      - START_CONSUMERS=true
       - PRODUCER_FLUSH_SIZE=1000
       - PRODUCER_THREADS_PER_WORKER=2
       - KAFKA_BOOTSTRAP_SERVERS_CONFIG=http://broker:29092
@@ -52,6 +52,20 @@ services:
     # image: intersystemsdc/irisdemo-demo-kafka:payment-kafka-ingest-worker-version-1.1.1
     ports:
       - "10003:8080" # Where Springboot Will be listening
+    environment:
+      - MASTER_HOSTNAME=master
+      - MASTER_PORT=8080
+  
+  query-worker1:
+    depends_on: 
+      - master
+      - broker
+    container_name: query-worker1
+    hostname: query-worker1
+    init: true
+    image: intersystemsdc/irisdemo-demo-kafka:banksim-kafka-consumer-worker-version-1.1.1
+    ports:
+      - "10004:8080" # Where Springboot Will be listening
     environment:
       - MASTER_HOSTNAME=master
       - MASTER_PORT=8080

@@ -115,47 +115,42 @@ public class KafkaWorker implements IWorker
 	    		currentBatchSize = 0;
 	    		batchSizeInBytes = 0;
 	    		
-	    		while(workerSemaphore.green())
+	    		while(currentBatchSize < config.getProducerFlushSize())
 	    		{
-	    			if (currentBatchSize==config.getProducerFlushSize()) 
-	    				break;
-
-					//randomDataGenerator.populateJSONRequest(requestJSON, threadPrefix, schema, ++currentRecord);
+					
 					avroEvent = simulator.nextAvroEvent();
 
-					if (avroEvent == null) 
-					{
-						break;
-					}
-					else if (avroEvent instanceof TransferAvroEvent)
+					if (avroEvent instanceof TransferAvroEvent)
 					{
 						transfersRecord = new ProducerRecord<Long, TransferAvroEvent>(transferTopic, (Long)avroEvent.get("id"), (TransferAvroEvent)avroEvent);
 						producer.send(transfersRecord);
+						batchSizeInBytes += transfersRecord.toString().getBytes().length;
+						currentBatchSize++;
 					}
 					else if (avroEvent instanceof DemographicsAvroEvent)
 					{
 						demographicsRecord = new ProducerRecord<Long, DemographicsAvroEvent>(demographicsTopic, (Long)avroEvent.get("id"), (DemographicsAvroEvent)avroEvent);
 						producer.send(demographicsRecord);
+						batchSizeInBytes += demographicsRecord.toString().getBytes().length;
+						currentBatchSize++;
 					}
 					else if (avroEvent instanceof LoanContractAvroEvent)
 					{
 						loanContractsRecord = new ProducerRecord<Long, LoanContractAvroEvent>(loanContractsTopic, (Long)avroEvent.get("id"), (LoanContractAvroEvent)avroEvent);
 						producer.send(loanContractsRecord);
+						batchSizeInBytes += loanContractsRecord.toString().getBytes().length;
+						currentBatchSize++;
 					}
-					
-					currentBatchSize++;
+
 				}
 				
-				if(workerSemaphore.green())
-				{
-					producer.flush();
-					accumulatedMetrics.addToStats(currentBatchSize, batchSizeInBytes);
+				producer.flush();
+				accumulatedMetrics.addToStats(currentBatchSize, batchSizeInBytes);
 
-					if (producerThrottlingInMillis>0)
-						Thread.sleep(producerThrottlingInMillis);
-				}
+				if (producerThrottlingInMillis>0)
+					Thread.sleep(producerThrottlingInMillis);
 
-				if (avroEvent == null) break;
+				//if (avroEvent == null) break;
 			}
 
 		}
@@ -174,8 +169,6 @@ public class KafkaWorker implements IWorker
     	return CompletableFuture.completedFuture(recordNum);
 	 }
 
-
-
 	 @Override
 	 public void resetDemo() throws Exception
 	 {
@@ -184,6 +177,4 @@ public class KafkaWorker implements IWorker
 		 //MAKE REST CALL TO IRIS, WHICH THEN EMPTIES & TRUNCATES TABLE TABLE
 	
 	}
-
-	
 }
