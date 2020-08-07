@@ -4,13 +4,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.serialization.*;
-import com.intersystems.enslib.pex.InboundAdapter;
-import com.intersystems.gateway.GatewayContext;
-import com.intersystems.jdbc.IRISConnection;
-import com.intersystems.jdbc.IRISList;
-import com.intersystems.jdbc.IRISObject;
-
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Properties;
 import java.time.Duration;
@@ -37,8 +30,6 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 	private static boolean succesfulDeserializationOfBatch = true;
 	private static Exception thrownExceptionDuringDeserialization;
 	private boolean newDataHasArrived = true;
-
-	IRISConnection connection = null;
 
 	private Consumer<Object, GenericRecord> createConsumer() throws Exception
 	{
@@ -74,8 +65,6 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 	@Override
 	public void OnInit() throws Exception 
 	{
-		connection = GatewayContext.getConnection();
-
 		this.consumer = createConsumer();
 		startConsumerThread();
 	}
