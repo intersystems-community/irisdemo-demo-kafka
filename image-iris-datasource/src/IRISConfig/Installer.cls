@@ -68,6 +68,29 @@ ClassMethod ConfigSchemaRegistry(pNamespace As %String, pSchemaRegistryURL As %S
 	Quit tSC
 }
 
+ClassMethod DisableJournalForDatabase(pDatabaseName As %String) As %Status
+{
+	Set tSC = $$$OK
+	Try
+	{
+		Set tSC = ##class(Config.Databases).Get(pDatabaseName, .v)
+		Quit:$$$ISERR(tSC)
+
+		Set tDatabaseDir = v("Directory")
+
+		Set db=##Class(SYS.Database).%OpenId(tDatabaseDir)
+		Set db.GlobalJournalState=2
+
+		Set tSC = db.%Save()
+	}
+	Catch (oException)
+	{
+		Set tSC = oException.AsStatus()
+	}	
+		
+	Quit tSC
+}
+
 /// You can customize this to run code during docker build
 XData Install [ XMLNamespace = INSTALLER ]
 {
@@ -99,6 +122,9 @@ XData Install [ XMLNamespace = INSTALLER ]
 	<Invoke Class="IRISConfig.Installer" Method="ConfigSchemaRegistry" CheckStatus="true">
 		<Arg name="pNamespace" Value="${Namespace}"/>
 		<Arg name="SchemaRegistryURL" Value="http://schema-registry:8081"/>
+	</Invoke>
+	<Invoke Class="IRISConfig.Installer" Method="DisableJournalForDatabase" CheckStatus="true">
+		<Arg name="pNamespace" Value="${Namespace}"/>
 	</Invoke>
 </Manifest>
 }

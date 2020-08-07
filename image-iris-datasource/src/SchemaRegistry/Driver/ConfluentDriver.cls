@@ -118,6 +118,7 @@ Method DownloadSchema(pSubject As %String, pVersion As %Integer, Output pSchema)
         Set pSchema("subject")=schemaObj.subject
         Set pSchema("version")=schemaObj.version
         Set pSchema("id")=schemaObj.id
+        Set pSchema("signature")=$System.Encryption.Base32HexEncode($System.Encryption.SHA1Hash(schemaObj.schema))
         Set pSchema("schema")=schemaObj.schema
     }
     Catch (oException)

@@ -20,6 +20,9 @@ http://localhost:8081/subjects/customer_demographics-value/versions/1
 https://docs.confluent.io/current/schema-registry/schema_registry_tutorial.html
 
 
+http://127.0.0.1:10001/csp/appint/rest/data/com.irisdemo.banksim.avroevent.V1.DemographicsAvroEvent/2
+
+
 The demo relies on an unreleased version of irisdemo-base-irisint:version-1.8.0. This version of
 the irisint base image is based on IRIS 2020.4.0ETL.130.0 which includes the code for Java ETL that
 supports creating IRIS classes based on Avro Schema provided by Dan Pasco.

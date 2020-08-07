@@ -18,112 +18,24 @@ Parameter CHARSET = "utf-8";
 XData UrlMap
 {
 <Routes>
-	<Route Url="/v1/:id" Method="get" Call="GetV1" />
-	<Route Url="/v2/:id" Method="get" Call="GetV2" />
-	<Route Url="/canonical/:id" Method="get" Call="GetCanonical" />
-	<Route Url="/v1" Method="post" Call="CreateV1" />
-	<Route Url="/v1/batch" Method="post" Call="CreateV1Batch" />
-	<Route Url="/v2" Method="post" Call="CreateV2" />
-	<Route Url="/v2/batch" Method="post" Call="CreateV2Batch" />
+	<Route Url="/data/:pClassName/:pID" Method="get" Call="Get" />
 </Routes>
 }
 
-ClassMethod GetV1(id) As %Status
+/// Example http://127.0.0.1:10001/csp/appint/rest/data/com.irisdemo.banksim.avroevent.V1.DemographicsAvroEvent/2
+ClassMethod Get(pClassName As %String, pID As %String) As %Status
 {
-	Quit ..Get("V1", id)
-}
+	Set ^t(pClassName)=pID
 
-ClassMethod GetV2(id) As %Status
-{
-	Quit ..Get("V2", id)
-}
-
-ClassMethod GetCanonical(id) As %Status
-{
-	Quit ..Get("", id)
-}
-
-ClassMethod CreateV1() As %Status
-{
-	Quit ..Create("V1")
-}
-
-ClassMethod CreateV2() As %Status
-{
-	Quit ..Create("V2")
-}
-
-ClassMethod CreateV1Batch() As %Status
-{
-	Quit ..Create("V1", 1)
-}
-
-ClassMethod CreateV2Batch() As %Status
-{
-	Quit ..Create("V2", 1)
-}
-
-ClassMethod Create(pVersion As %String, pBatchMode As %Boolean = 0) As %Status
-{
-	Set status = $$$OK
-	Try
-	{
-		// Configuring response type to JSON
-		Set %response.ContentType=..#CONTENTTYPEJSON
-		Set %response.Status = ..#HTTP200OK
-		
-		Set response = {}
-		
-		// Instantiating the right class for the version
-		If pBatchMode
-		{
-			Set tClassName="Original."_pVersion_".CustomerBatch"
-		}
-		Else 
-		{
-			Set tClassName="Original."_pVersion_".Customer"
-		}
-		
-		Set original = $classmethod(tClassName, "%New")
-
-		// Importing the JSON into the instance
-		Set status = original.%JSONImport(%request.Content)
-		$$$ThrowBadRequestExceptionIfError(status, "JSONImportException")
-		
-		// Saving to disk
-		Set status = original.%Save()
-		$$$ThrowStatusExceptionIfError(status, "SaveObjectException")
-
-		Do ..ReportHTTPStatusCreated(original.%Id())
-	}
-	Catch (oException)
-	{
-		Do ..ErrorHandling(oException)
-	}
-
-	Quit $$$OK
-}
-
-ClassMethod Get(pVersion As %String, pID As %String) As %Status
-{
 	Set status = $$$OK
 	Try
 	{
 		Set %response.Status = ..#HTTP200OK
 		Set %response.ContentType=..#CONTENTTYPEJSON
-
-		If pVersion'=""
-		{
-			Set tClassName="Original."_pVersion_".Customer"
-		}
-		Else
-		{
-			Set tClassName="Canonical.Customer"
-		}
 		
-		Set obj = $classmethod(tClassName, "%OpenId", pID)
+		Set obj = $classmethod(pClassName, "%OpenId", pID)
 		
-		If obj="" $$$ThrowNotFoundException("Customer with id "_pID_" not found")
+		If obj="" $$$ThrowNotFoundException("Id "_pID_" not found on "_pClassName)
 
 		Do obj.%JSONExport()
 	}

@@ -16,16 +16,20 @@ ClassMethod CreateOrReplaceClassTree(pConfigName As %String, pSchema) As %Status
 
         Set subject=pSchema("subject")
         Set version=pSchema("version")
+        Set signature=pSchema("signature")
         Set id=pSchema("id")
 
         TStart
 
         Set schema = {}.%FromJSON(pSchema("schema"))
 
-        Set tSC = ..CreateOrReplaceClassBasedOnSchema("", schema, version, .createdClassName, pConfigName, subject, id)
+        Set tSC = ..CreateOrReplaceClassBasedOnSchema("", schema, signature, version, .createdClassName, pConfigName, subject, id)
         Quit:$$$ISERR(tSC)
 
-        Set tSC = $System.OBJ.Compile(createdClassName, "cdk")
+        If createdClassName'=""
+        {
+            Set tSC = $System.OBJ.Compile(createdClassName, "cdk")
+        }
     }
     Catch (oException)
     {
@@ -44,7 +48,7 @@ ClassMethod CreateOrReplaceClassTree(pConfigName As %String, pSchema) As %Status
     Quit tSC
 }
 
-ClassMethod CreateOrReplaceClassBasedOnSchema(namespace, schema, version, Output pCreatedClassName As %String, pConfigName = "", subject = "", id = "") As %Status
+ClassMethod CreateOrReplaceClassBasedOnSchema(namespace, schema, signature, version, Output pCreatedClassName As %String, pConfigName = "", subject = "", id = "") As %Status
 {
     #define H(%prop) $Get(pSchema(%prop))
     //#define F(%prop) $Get(pSchema("schema","fields",iField,%prop))
@@ -57,21 +61,37 @@ ClassMethod CreateOrReplaceClassBasedOnSchema(namespace, schema, version, Output
             Set namespace=schema.namespace
         }
 
-        Set pCreatedClassName=namespace_"."_schema.name_"V"_version
+        Set pCreatedPackage=namespace_".V"_version
+        Set pCreatedClassName=pCreatedPackage_"."_schema.name
+
+        // If this is the root class
+        If pConfigName'=""
+        {
+            Set classDef = ##class(%Dictionary.ClassDefinition).%OpenId(pCreatedClassName)
+
+            If $IsObject(classDef) && (..GetClassParameter(classDef, "SCHEMASIGNATURE")=signature)
+            {
+                Set pCreatedClassName=""
+                Quit
+            }
+        }
 
         Do ##class(%Dictionary.ClassDefinition).%DeleteId(pCreatedClassName)
 
         Write !,"Creating class ",pCreatedClassName,"..."
         Set classDef = ##class(%Dictionary.ClassDefinition).%New(pCreatedClassName)
         
+        // If this is the root class
         If pConfigName'=""
         {
+            Do ..AddClassParamter(classDef, "SCHEMAIMPORTDATE", $ZDateTime($Horolog,3))
+            Do ..AddClassParamter(classDef, "SCHEMASIGNATURE", signature)
             Do ..AddClassParamter(classDef, "SCHEMACONFIG", pConfigName)
             Do ..AddClassParamter(classDef, "SCHEMAID", id)
             Do ..AddClassParamter(classDef, "SCHEMASUBJECT", subject)
             Do ..AddClassParamter(classDef, "SCHEMAVERSION", version)
 
-            Set classDef.Super="%Persistent"
+            Set classDef.Super="%Persistent,SchemaRegistry.SchemaGenerated"
         }
         Else
         {
@@ -101,7 +121,7 @@ ClassMethod CreateOrReplaceClassBasedOnSchema(namespace, schema, version, Output
                 }
                 Else
                 {
-                    Set tSC = ..CreateOrReplaceClassBasedOnSchema(namespace, field.type, version, .tIRISType)
+                    Set tSC = ..CreateOrReplaceClassBasedOnSchema(namespace, field.type, signature, version, .tIRISType)
                 }
             }
 
@@ -144,6 +164,19 @@ ClassMethod AddClassParamter(pClassDef As %Dictionary.ClassDefinition, pParamNam
     Set oParam.Default=pParamValue
     Set oParam.Name=pParamName
     Do pClassDef.Parameters.Insert(oParam)
+}
+
+ClassMethod GetClassParameter(pClassDef As %Dictionary.ClassDefinition, pParamName As %String) As %String
+{
+    For i=1:1:pClassDef.Parameters.Count()
+    {
+        Set oParam = pClassDef.Parameters.GetAt(i)
+        If oParam.Name=pParamName
+        {
+            Return oParam.Default
+        }
+    }
+    Return ""
 }
 
 ClassMethod AddProperty(pClassDef As %Dictionary.ClassDefinition, pPropertyName As %String, pIRISType As %String, pType As %String, pLogicalType As %String, pRequired As %Boolean, pDefaultValue As %String)

@@ -76,6 +76,7 @@ public class Config
 		this.maxTimeToRunInSeconds=maxTimeToRunInSeconds;
 	}
 
+	@Value( "${PRODUCER_THROTTLING:10}" )
 	public void setProducerThrottlingInMillis(long val)
 	{
 		logger.info("Setting producer throttling in Millis to " + val + "ms.");
