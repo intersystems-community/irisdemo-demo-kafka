@@ -190,7 +190,6 @@ public class Config
 		return consumptionJDBCURL;
 	}
 	
-	@Value( "${CONSUMER_JDBC_URL}" )
 	public void setConsumptionJDBCURL(String consumptionJDBCURL) {
 		logger.info("Setting CONSUMER_JDBC_URL = " + consumptionJDBCURL);
 		this.consumptionJDBCURL = consumptionJDBCURL;
@@ -200,7 +199,6 @@ public class Config
 		return consumptionJDBCUserName;
 	}
 	
-	@Value( "${CONSUMER_JDBC_USERNAME}" )
 	public void setConsumptionJDBCUserName(String consumptionJDBCUserName) {
 		logger.info("Setting CONSUMER_JDBC_USERNAME = " + consumptionJDBCUserName);
 		this.consumptionJDBCUserName = consumptionJDBCUserName;
@@ -210,7 +208,6 @@ public class Config
 		return consumptionJDBCPassword;
 	}
 	
-	@Value( "${CONSUMER_JDBC_PASSWORD}" )
 	public void setConsumptionJDBCPassword(String consumptionJDBCPassword) {
 		logger.info("Setting CONSUMER_JDBC_PASSWORD = " + consumptionJDBCPassword);
 		this.consumptionJDBCPassword = consumptionJDBCPassword;
@@ -220,7 +217,6 @@ public class Config
 		return consumptionNumThreadsPerWorker;
 	}
 	
-	@Value( "${CONSUMER_THREADS_PER_WORKER:10}" )
 	public void setConsumptionNumThreadsPerWorker(int consumptionNumThreadsPerWorker) {
 		logger.info("Setting CONSUMER_THREADS_PER_WORKER= " + consumptionNumThreadsPerWorker);
 		this.consumptionNumThreadsPerWorker = consumptionNumThreadsPerWorker;
@@ -230,7 +226,6 @@ public class Config
 		return consumptionTimeBetweenQueriesInMillis;
 	}
 	
-	@Value( "${CONSUMER_TIME_BETWEEN_QUERIES_IN_MILLIS:0}" )
 	public void setConsumptionTimeBetweenQueriesInMillis(int consumptionTimeBetweenQueriesInMillis) {
 		logger.info("Setting CONSUMER_TIME_BETWEEN_QUERIES_IN_MILLIS = " + consumptionTimeBetweenQueriesInMillis);
 		this.consumptionTimeBetweenQueriesInMillis = consumptionTimeBetweenQueriesInMillis;

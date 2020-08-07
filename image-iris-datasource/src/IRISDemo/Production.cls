@@ -37,6 +37,7 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="AutoOffsetResetConfig">earliest</Setting>
     <Setting Target="Adapter" Name="StorageClassName">com.irisdemo.banksim.avroevent.V1.TransferAvroEvent</Setting>
     <Setting Target="Host" Name="TargetConfigName">Trace Operation</Setting>
+    <Setting Target="Adapter" Name="CallProcessInputUponNewData">1</Setting>
   </Item>
   <Item Name="Schema Registry Service" Category="" ClassName="SchemaRegistry.Monitor.Service" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="ConfigName">ConfluentKafka</Setting>
@@ -50,6 +51,8 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="GroupId">iris.loan.contracts</Setting>
     <Setting Target="Adapter" Name="AutoOffsetResetConfig">earliest</Setting>
     <Setting Target="Adapter" Name="%gatewayPort">55555</Setting>
+    <Setting Target="Host" Name="TargetConfigName">Trace Operation</Setting>
+    <Setting Target="Adapter" Name="CallProcessInputUponNewData">1</Setting>
   </Item>
   <Item Name="Kafka Customer Demographics Service" Category="" ClassName="Kafka.Service.KeyLessAvroService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Adapter" Name="KafkaBrokerURL">http://broker:9092</Setting>
@@ -59,6 +62,8 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="AutoOffsetResetConfig">earliest</Setting>
     <Setting Target="Adapter" Name="StorageClassName">com.irisdemo.banksim.avroevent.V1.DemographicsAvroEvent</Setting>
     <Setting Target="Adapter" Name="%gatewayPort">55555</Setting>
+    <Setting Target="Host" Name="TargetConfigName">Trace Operation</Setting>
+    <Setting Target="Adapter" Name="CallProcessInputUponNewData">1</Setting>
   </Item>
 </Production>
 }
