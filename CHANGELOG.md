@@ -1,3 +1,6 @@
+## 1.2.3 (August 07, 2020)
+  - Using irisdemo-base-mavenc:version 1.4.0
+
 ## 1.2.2 (August 07, 2020)
   - banksim
   - Fixing submodule problems. Integrating Phillip's code.
