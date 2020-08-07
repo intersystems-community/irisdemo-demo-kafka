@@ -8,6 +8,8 @@ source ./buildtools.sh
 # But we need to start with an empty file:
 rm -f ./images_built
 
+git submodule update --init --recursive
+
 ###############################################################
 # IRIS Data Source Image
 ###############################################################

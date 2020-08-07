@@ -6,7 +6,7 @@ LABEL maintainer="Amir Samary <amir.samary@intersystems.com>"
 ENV JAVA_OPTS=-Xmx1024M
 
 # Default configuration. Should be replaced on docker run or docker-compose.yml file
-ENV MASTER_SPEEDTEST_TITLE=InterSystems IRIS Kafka Demo with AVRO and Schema Evolution
+ENV MASTER_SPEEDTEST_TITLE="InterSystems IRIS Kafka Demo with AVRO and Schema Evolution"
 ENV PRODUCER_THROTTLING=10
 ENV START_CONSUMERS=false
 ENV PRODUCER_FLUSH_SIZE=1000

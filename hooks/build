@@ -10,6 +10,8 @@ echo "   DOCKERFILE_PATH: $DOCKERFILE_PATH"
 echo "   DOCKER_TAG     : $DOCKER_TAG"
 echo "   DOCKER_TAG     : $IMAGE_NAME"
 
+git submodule update --init --recursive
+
 source ./buildtools.sh
 
 # funtion build_java_project will add a line with the full image name of each image built
