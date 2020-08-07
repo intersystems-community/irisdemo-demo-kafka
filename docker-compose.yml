@@ -56,6 +56,20 @@ services:
     environment:
       - MASTER_HOSTNAME=master
       - MASTER_PORT=8080
+  
+  query-worker1:
+    depends_on: 
+      - master
+      - broker
+    container_name: query-worker1
+    hostname: query-worker1
+    init: true
+    image: intersystemsdc/irisdemo-demo-kafka:banksim-kafka-consumer-worker-version-1.1.1
+    ports:
+      - "10004:8080" # Where Springboot Will be listening
+    environment:
+      - MASTER_HOSTNAME=master
+      - MASTER_PORT=8080
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.1

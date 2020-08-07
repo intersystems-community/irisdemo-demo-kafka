@@ -8,7 +8,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>com.irisdemo.htap</groupId>
+	<groupId>com.irisdemo.kafka</groupId>
 	<artifactId>query-worker-parent-project</artifactId>
 	<version>1.0.0</version>
 	<name>query-worker-parent-project</name>
@@ -36,11 +36,8 @@
   
   	<modules>
 		<module>query-controller-module</module>
-		<module>iris-jdbc-query-worker</module>
-		<module>mysql-jdbc-query-worker</module>
-		<module>hana-jdbc-query-worker</module>
-		<module>mssqlserver-jdbc-query-worker</module>
-		<module>sybasease-jdbc-query-worker</module>
+		<module>banksim-kafka-consumer-worker</module>
+		<module>irisdemo-base-banksim</module>
 	</modules>
   
     <build>
