@@ -24,6 +24,7 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -59,9 +60,18 @@ public class KafkaWorker implements IWorker
 	
 	protected KafkaProducer producer = null;
 
+	/*
 	protected final String transferTopic = "transfers";
 	protected final String demographicsTopic = "customer_demographics";
 	protected final String loanContractsTopic = "loan_contracts";
+	protected final String newCustomerTopic = "new_customer";
+	*/
+
+	// To guarantee message sequencing
+	protected final String transferTopic = "core-banking-system-events";
+	protected final String demographicsTopic = "core-banking-system-events";
+	protected final String loanContractsTopic = "core-banking-system-events";
+	protected final String newCustomerTopic = "core-banking-system-events";
 
 	protected static char[] prefixes = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
@@ -79,6 +89,8 @@ public class KafkaWorker implements IWorker
         props.put(ProducerConfig.RETRIES_CONFIG, 0);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
+		props.put(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, "io.confluent.kafka.serializers.subject.RecordNameStrategy");
+		props.put(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, "io.confluent.kafka.serializers.subject.RecordNameStrategy");
 		props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, config.getSchemaRegistryURLConfig());
 		this.producer = new KafkaProducer(props);
 	}
@@ -94,7 +106,8 @@ public class KafkaWorker implements IWorker
 		ProducerRecord<Long, TransferAvroEvent> transfersRecord = null;
 		ProducerRecord<Long, DemographicsAvroEvent> demographicsRecord = null;
 		ProducerRecord<Long, LoanContractAvroEvent> loanContractsRecord = null;
-
+		ProducerRecord<Long, NewCustomerAvroEvent> newCustomerRecord = null;
+		
 		long producerThrottlingInMillis = config.getProducerThrottlingInMillis();
 
 		accumulatedMetrics.incrementNumberOfActiveIngestionThreads();
@@ -129,18 +142,23 @@ public class KafkaWorker implements IWorker
 					}
 					else if (avroEvent instanceof TransferAvroEvent)
 					{
-						transfersRecord = new ProducerRecord<Long, TransferAvroEvent>(transferTopic, (Long)avroEvent.get("id"), (TransferAvroEvent)avroEvent);
+						transfersRecord = new ProducerRecord<Long, TransferAvroEvent>(transferTopic, (Long)avroEvent.getPartitionKey(), (TransferAvroEvent)avroEvent);
 						producer.send(transfersRecord);
 					}
 					else if (avroEvent instanceof DemographicsAvroEvent)
 					{
-						demographicsRecord = new ProducerRecord<Long, DemographicsAvroEvent>(demographicsTopic, (Long)avroEvent.get("id"), (DemographicsAvroEvent)avroEvent);
+						demographicsRecord = new ProducerRecord<Long, DemographicsAvroEvent>(demographicsTopic, (Long)avroEvent.getPartitionKey(), (DemographicsAvroEvent)avroEvent);
 						producer.send(demographicsRecord);
 					}
 					else if (avroEvent instanceof LoanContractAvroEvent)
 					{
-						loanContractsRecord = new ProducerRecord<Long, LoanContractAvroEvent>(loanContractsTopic, (Long)avroEvent.get("id"), (LoanContractAvroEvent)avroEvent);
+						loanContractsRecord = new ProducerRecord<Long, LoanContractAvroEvent>(loanContractsTopic, (Long)avroEvent.getPartitionKey(), (LoanContractAvroEvent)avroEvent);
 						producer.send(loanContractsRecord);
+					}
+					else if (avroEvent instanceof NewCustomerAvroEvent)
+					{
+						newCustomerRecord = new ProducerRecord<Long, NewCustomerAvroEvent>(newCustomerTopic, (Long)avroEvent.getPartitionKey(), (NewCustomerAvroEvent)avroEvent);
+						producer.send(newCustomerRecord);
 					}
 					
 					currentBatchSize++;
@@ -165,7 +183,7 @@ public class KafkaWorker implements IWorker
 		} 
 		catch(Exception e)
 		{
-			logger.error("Ingestion worker #"+threadNum+" crashed with the following error:" + e.getMessage());
+			logger.error("Ingestion worker #"+threadNum+" crashed.", e);
 		}
 
 		accumulatedMetrics.decrementNumberOfActiveIngestionThreads();
