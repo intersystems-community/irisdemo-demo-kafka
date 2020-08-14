@@ -192,4 +192,4 @@ There are other IRIS demo applications that touch different subjects such as NLP
 
 # Report any Issues
 
-Please, report any issues on the [Issues section](https://github.com/intersystems-community/irisdemo-demo-finsrv-crosssell/issues).
+Please, report any issues on the [Issues section](https://github.com/intersystems-community/irisdemo-demo-kafka/issues).
