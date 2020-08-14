@@ -2,10 +2,14 @@
 
 source ../buildtools.sh
 
-# cd ./kafka-pex-adapter
-# ./build.sh
-# go_up_tree_and_exit_if_error "kafka-pex-adapter could not be built"
-# cd ..
+echo "Building kafka-pex-adapter jar file..."
+cd ./kafka-pex-adapter
+./build.sh
+go_up_tree_and_exit_if_error "kafka-pex-adapter could not be built"
+cd ..
+
+echo "kafka-pex-adapter jar file built!"
+echo "Building iris-datasource image now..."
 
 VERSION=`cat ../VERSION`
 DOCKER_TAG="version-${VERSION}"
