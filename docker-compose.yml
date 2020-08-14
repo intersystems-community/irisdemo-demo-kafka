@@ -7,7 +7,7 @@ version: '3.7'
 services:
 
   iris-datasource: 
-    image: intersystemsdc/irisdemo-demo-kafka:iris-datasource-version-1.2.3
+    image: intersystemsdc/irisdemo-demo-kafka:iris-datasource-version-1.3.0
     hostname: iris-datasource
     init: true
     container_name: iris-datasource
@@ -18,7 +18,7 @@ services:
     container_name: master
     hostname: master
     init: true
-    image: intersystemsdc/irisdemo-demo-kafka:master-version-1.2.3
+    image: intersystemsdc/irisdemo-demo-kafka:master-version-1.3.0
     ports:
       - "10002:8080" # Where Springboot Will be listening
     environment:
@@ -38,7 +38,7 @@ services:
       - master
     container_name: ui
     hostname: ui
-    image: intersystemsdc/irisdemo-demo-kafka:ui-version-1.2.3
+    image: intersystemsdc/irisdemo-demo-kafka:ui-version-1.3.0
     ports:
     - "10000:4200" # Where Node Will be listening
 
@@ -49,8 +49,8 @@ services:
     container_name: ingest-worker1
     hostname: ingest-worker1
     init: true
-    image: intersystemsdc/irisdemo-demo-kafka:banksim-kafka-ingest-worker-version-1.2.3
-    # image: intersystemsdc/irisdemo-demo-kafka:payment-kafka-ingest-worker-version-1.2.3
+    image: intersystemsdc/irisdemo-demo-kafka:banksim-kafka-ingest-worker-version-1.3.0
+    # image: intersystemsdc/irisdemo-demo-kafka:payment-kafka-ingest-worker-version-1.3.0
     ports:
       - "10003:8080" # Where Springboot Will be listening
     environment:
@@ -64,7 +64,7 @@ services:
   #   container_name: query-worker1
   #   hostname: query-worker1
   #   init: true
-  #   image: intersystemsdc/irisdemo-demo-kafka:banksim-kafka-consumer-worker-version-1.2.3
+  #   image: intersystemsdc/irisdemo-demo-kafka:banksim-kafka-consumer-worker-version-1.3.0
   #   ports:
   #     - "10004:8080" # Where Springboot Will be listening
   #   environment:
