@@ -28,23 +28,34 @@
 				windows again and all the tabs will be opened, one every second, on a new tab.
 				*/
 				
-				setTimeout("openWorkflow()", timeout());
-				
-				setTimeout("openDataStore()", timeout());
-				
+				// Demo 4
+				window_open('http://' + ip + ':10001/csp/appint/rest/data/corebanking.com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/2')
+
+				// Demo 3
+				setTimeout("openWorkflow()", timeout());				
+
+				// Demo 2:
 				setTimeout("openMessageTrace()", timeout());
 
-				setTimeout("openSimulator()", timeout());
-								
 				setTimeout("openDataLookup()", timeout());
 				
-				setTimeout("openDataTransformationV2()", timeout());
-				
-				setTimeout("openDataTransformationV1()", timeout());
+				setTimeout("openDataTransformation()", timeout());
 				
 				setTimeout("openBusinessProcess()", timeout());
 
+				setTimeout("openDataStore()", timeout());
+				
 				setTimeout("openProduction()", timeout());
+
+
+				// Demo 1:
+
+				setTimeout("openSimulator()", timeout());
+
+				setTimeout("openSchemaRegistry()", timeout());
+
+				setTimeout("openKafkaControlCenter()", timeout());
+				
 			}
 
 			function window_open(url)
@@ -59,6 +70,16 @@
 				window_open('http://' + ip + ':10000');
 			}
 
+			function openSchemaRegistry()
+			{
+				window_open('http://' + ip + ':8081/subjects/');
+			}
+
+			function openKafkaControlCenter()
+			{
+				window_open('http://' + ip + ':9021/');
+			}
+
 			function openProduction()
 			{
 				window_open('EnsPortal.ProductionConfig.zen?$NAMESPACE=APPINT&IRISUserName=SuperUser&IRISPassword=sys');
@@ -66,17 +87,12 @@
 
 			function openBusinessProcess()
 			{
-				window_open('EnsPortal.BPLEditor.zen?NAMESPACE=APPINT&BP=IRISDemo.BP.Customer.Process.bpl&IRISUserName=SuperUser&IRISPassword=sys')
+				window_open('EnsPortal.BPLEditor.zen?NAMESPACE=APPINT&BP=SchemaNormalization.Process.bpl&IRISUserName=SuperUser&IRISPassword=sys')
 			}
 
-			function openDataTransformationV1()
+			function openDataTransformation()
 			{
-				window_open('EnsPortal.DTLEditor.zen?NAMESPACE=APPINT&DT=Original.V1.DTL.Customer.dtl&IRISUserName=SuperUser&IRISPassword=sys')
-			}
-
-			function openDataTransformationV2()
-			{
-				window_open('EnsPortal.DTLEditor.zen?NAMESPACE=APPINT&DT=Original.V2.DTL.Customer.dtl&IRISUserName=SuperUser&IRISPassword=sys')
+				window_open('EnsPortal.DTLEditor.zen?DT=corebanking.com.irisdemo.banksim.avroevent.TransferAvroEventDTL.dtl&IRISUserName=SuperUser&IRISPassword=sys')
 			}
 
 			function openDataLookup()
@@ -96,19 +112,19 @@
 
 			function openDataStore()
 			{
-				window_open('http://' + ip + ':10001/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=APPINT&IRISUserName=SuperUser&IRISPassword=sys')
+				window_open('/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=APPINT&IRISUserName=SuperUser&IRISPassword=sys')
 			}
 			
-			function openOriginalV1()
+			function openRESTService()
 			{
-				window_open('http://' + ip + ':10001/csp/appint/rest/v1/1')
+				window_open('/csp/appint/rest/data/corebanking.com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/2?IRISUserName=SuperUser&IRISPassword=sys')
+			}
+			
+			function openCube()
+			{
+				//window_open('http://' + ip + ':10001/csp/appint/rest/data/corebanking.com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/2')
 			}
 
-			function openOriginalV2()
-			{
-				window_open('http://' + ip + ':10001/csp/appint/rest/v2/1')
-			}
-				
 			function openInstructions()
 			{
 				var btn = document.getElementById('instructionsbtn');
@@ -159,18 +175,22 @@
 		</center>
 
 		<map name="image-map">
-		    <area target="" alt="Open Data Simulator" title="Open Data Simulator" href="javascript:openSimulator()" coords="3,360,153,701" shape="rect">
-		    <area target="" alt="Open Original Document Schema V1" title="Open Original Document Schema V1" href="javascript:openOriginalV1()" coords="491,365,616,515" shape="rect">
-		    <area target="" alt="Open Original Document Schema V2" title="Open Original Document Schema V2" href="javascript:openOriginalV2()" coords="491,568,613,722" shape="rect">
-		    <area target="" alt="Open Transformation for Schema V1" title="Open Transformation for Schema V1" href="javascript:openDataTransformationV1()" coords="857,334,958,446" shape="rect">
-		    <area target="" alt="Open Transformation for Schema V2" title="Open Transformation for Schema V2" href="javascript:openDataTransformationV2()" coords="977,334,1077,448" shape="rect">
-		    <area target="" alt="Open Data Lookup (cross-walk to ref. data)" title="Open Data Lookup (cross-walk to ref. data)" href="javascript:openDataLookup()" coords="1099,327,1201,455" shape="rect">
-		    <area target="" alt="Open Normalization Process" title="Open Normalization Process" href="javascript:openBusinessProcess()" coords="857,467,1180,631" shape="rect">
-		    <area target="" alt="Open Ingestion Service in Production" title="Open Ingestion Service in Production" href="javascript:openProduction()" coords="620,438,810,519" shape="rect">
-		    <area target="" alt="Open Ingestion Service in Production" title="Open Ingestion Service in Production" href="javascript:openProduction()" coords="624,582,813,661" shape="rect">
-		    <area target="" alt="Open Data Lineage" title="Open Data Lineage" href="javascript:openMessageTrace()" coords="1212,509,1380,593" shape="rect">
-		    <area target="" alt="Open Workflow Inbox" title="Open Workflow Inbox" href="javascript:openWorkflow()" coords="1080,733,1255,952" shape="rect">
-		    <area target="" alt="Open Canonical Data Store" title="Open Canonical Data Store" href="javascript:openDataStore()" coords="1398,477,1545,635" shape="rect">
+			<area target="" alt="Open Data Simulator" title="Open Data Simulator" href="javascript:openSimulator()" coords="2,322,158,672" shape="rect">
+			<area target="" alt="See Schemas Registered" title="See Schemas Registered" href="javascript:openSchemaRegistry()" coords="256,275,476,275,453,357,236,361" shape="poly">
+			<area target="" alt="Open Confluent Control Center" title="Open Confluent Control Center" href="javascript:openKafkaControlCenter()" coords="260,453,476,455,455,539,238,541" shape="poly">
+			<area target="" alt="Open IRIS Production" title="Open IRIS Production" href="javascript:openProduction()" coords="488,277,617,275,658,318,617,359,488,359" shape="poly">
+			<area target="" alt="Open IRIS Production" title="Open IRIS Production" href="javascript:openProduction()" coords="488,453,617,451,662,494,619,537,490,537" shape="poly">
+			<area target="" alt="Open SQL Query" title="Open SQL Query" href="javascript:openDataStore()" coords="672,434,734,426,797,436,795,576,738,586,674,574" shape="poly">
+			<area target="" alt="Open Message Trace Log" title="Open Message Trace Log" href="javascript:openMessageTrace()" coords="810,451,941,449,996,508,939,566,812,566" shape="poly">
+			<area target="" alt="Open Schema Normalization Process" title="Open Schema Normalization Process" href="javascript:openBusinessProcess()" coords="1007,430,1341,598" shape="rect">
+			<area target="" alt="Open Money Transfer Transformation" title="Open Money Transfer Transformation" href="javascript:openDataTransformation()" coords="1009,283,1125,410" shape="rect">
+			<area target="" alt="Open Terminology Lookup for State Codes" title="Open Terminology Lookup for State Codes" href="javascript:openDataLookup()" coords="1142,297,1193,281,1246,297,1246,412,1193,420,1142,408" shape="poly">
+			<area target="" alt="Open Workflow Inbox" title="Open Workflow Inbox" href="javascript:openWorkflow()" coords="1242,713,1400,914" shape="rect">
+			<area target="" alt="Open Message Trace Log" title="Open Message Trace Log" href="javascript:openMessageTrace()" coords="1357,467,1480,465,1519,506,1482,553,1359,553" shape="poly">
+			<area target="" alt="Open SQL Query" title="Open SQL Query" href="javascript:openDataStore()" coords="1538,254,1847,742" shape="rect">
+			<area target="" alt="See Data through a REST API" title="See Data through a REST API" href="javascript:openRESTService()" coords="1958,428,2103,428,2149,473,2105,520,1956,518" shape="poly">
+			<area target="" alt="Open SQL Query" title="Open SQL Query" href="javascript:openDataStore()" coords="1952,203,2105,203,2148,248,2101,295,1952,295" shape="poly">
+			<area target="" alt="Open InterSystems IRIS Business Intelligence" title="Open InterSystems IRIS Business Intelligence" href="javascript:openCube()" coords="1958,316,2101,316,2148,361,2103,406,1956,406" shape="poly">
 		</map>
 						
 		<table width="100%" style="text-align: center;">

@@ -119,9 +119,118 @@ http://127.0.0.1:10001/csp/appint/rest/data/corebanking.com.irisdemo.banksim.avr
 }
 ```
 
+## How does the Demo uses AVRO and AVRO Schemas
+
+A very good introduction to AVRO can be found [here](https://avro.apache.org/docs/current/index.html) and a very nice introduction to its schema language can be found [here](https://avro.apache.org/docs/current/spec.html).
+
+Many financial services organizations are using Kafka to ship data from one system to another and also to store data indefinitely for when a system needs it. Kafka does not define the structure of its messages. They can be as simple as a string or an integer or have a custom format defined by the developer and shipped as a byte array. But instead of coming up with yet another serialization format, companies are adopting standard serializtion formats such as AVRO and [Protobuf](https://developers.google.com/protocol-buffers) to share data among applications.
+
+The advantage of using AVRO or Protobuf is that they provide with a standard way of defining a **shared schema** for messages. In the case of AVRO, the schemas are defined using JSON which is very easy to use and read for both humans and machines. Programing languages such as Java, Python, C, etc. can then use these schemas to generate data structures such as classes that programmers can use to parse and produce messages.
+
+So, while Kafka is the medium and it is agnostic of the payloads that it is delivering, AVRO provides for a standard serialization format so any programming language can now communicate effictively over Kafka using their own data structures.
+
+On this demo, we implemented enough of the AVRO schema language to be able to generate InterSystems IRIS classes/tables to hold the data. The Schema Registry Service will periodically pull the AVRO schemas registered there and build InterSystems IRIS classes to hold the messages sent over Kafka.
+
+You can click on the Schema Registry image at the demo landing page or just open the following URL to see the schemas that are registered there:
+
+http://localhost:8081/subjects/
+
+If you don't see anything when opening this URL, make sure the demo is running and that you have run the bank simulator at least once and let at least 100K messages be sent to Kafka. On this demo, the schemas will be registered as messages are sent. On a typical production system, that would not happen. The Schema Registry dictates what schemas can be used by message producers and will block a producer to send a message for which there is no schema registered at the schema registry.
+
+When you see a schema under the URL above, you can also ask for its versions:
+
+http://localhost:8081/subjects/com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/versions/
+
+This will probably return an array with a single value (version 1). That is because we are not playing with multiple versions of a schema on this demo. We will make this in future iterations of this demo. But you can keep going and ask to see a specific version of a schema:
+
+http://localhost:8081/subjects/com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/versions/1
+
+Here is an example:
+
+```JSON
+{
+    "subject":"com.irisdemo.banksim.avroevent.NewCustomerAvroEvent",
+    "version":1,
+    "id":1,
+    "schema":"{\"type\":\"record\",\"name\":\"NewCustomerAvroEvent\",\"namespace\":\"com.irisdemo.banksim.avroevent\",\"fields\":[{\"name\":\"eventId\",\"type\":\"long\"},{\"name\":\"eventDate\",\"type\":\"string\",\"logicalType\":\"timestamp-millis\"},{\"name\":\"customerId\",\"type\":\"long\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"accountNumber\",\"type\":\"string\"},{\"name\":\"initialAmount\",\"type\":\"double\"},{\"name\":\"address\",\"type\":{\"type\":\"record\",\"name\":\"mailing_address\",\"fields\":[{\"name\":\"state\",\"type\":\"string\"},{\"name\":\"city\",\"type\":\"string\"},{\"name\":\"phone\",\"type\":\"string\"}]}}]}"
+}
+```
+
+This is not a pure AVRO schema. The AVRO schema is actually under the **schema** attribute as a string. This is just a schema registry structure that holds the schema and its metadata such as its id and version. Here is the actuall AVRO schema:
+
+```JSON
+{
+    "type":"record",
+    "name":"NewCustomerAvroEvent",
+    "namespace":"com.irisdemo.banksim.avroevent",
+    "fields":
+    [
+        {"name":"eventId","type":"long"},
+        {"name":"eventDate","type":"string","logicalType":"timestamp-millis"},
+        {"name":"customerId","type":"long"},
+        {"name":"name","type":"string"},
+        {"name":"accountNumber","type":"string"},
+        {"name":"initialAmount","type":"double"},
+        {"name":"address",
+        "type": {
+            "type":"record",
+            "name":"mailing_address",
+            "fields":
+                [
+                    {"name":"state", "type":"string"},
+                    {"name":"city","type":"string"},
+                    {"name":"phone","type":"string"}
+                ]
+            }
+        }
+    ]
+}
+```
+
+This is what the **Schema Registry Service** fetches to generate the InterSystems IRIS tables/classes to hold the data. This service uses a **Schema Registry Configuration** that defines the schema registry URL and other aspects. You can query the configuration with SQL:
+
+```SQL
+SELECT * FROM SchemaRegistry.Config
+```
+
+| ID | DriverName | EndPoint                    | Name        | SubjectNamingStrategy |
+|----|------------|-----------------------------|-------------|-----------------------|
+|1   | Confluent  |	http://schema-registry:8081 | corebanking | RecordNameStrategy    |
+
+
+## Where are the tables that hold the original data?
+
+As explained above, the tables are genereated automatically inside InterSystems IRIS by the **Schema Registry Service**. This service is deployed on an InterSystems IRIS production and configured with a **SchemaRegistry.Config**. We only have one config, because we have only one schema registry. This configuration has a **name**. 
+
+The schema registry service generates classes/tables with the following naming convention:
+
+(**ConfigName**)_(**schena namespace**).(**schema name**)
+
+So the schema above will produce a table like this:
+
+**corebanking**_**com_irisdemo_banksim_avroevent**.**NewCustomerAvroEvent**
+
+As we have many avro events coming from the bank simulator, we will end up with many schemas. They are all under the same namespace, so the will be all together under the **corebanking**_**com_irisdemo_banksim_avroevent** schema.
+
+Events will be added to their own tables and an numeric autogenerated ID column will provide for a unique identification of each message. The Schema Registry Service will also generate a table called **corebanking.AllObjects** that you can use to select all the events that have been stored in these tables in the sequence that they were originally stored in in Kafka. This is a very important table for us. We use it to know which message to process next to guaranteee the proper sequence of processing of the messages.
+
+## What does the Schema Normalization Process does?
+
+There is another service on the InterSystems IRIS production called **Schema Normalization Service** that keeps pulling messages from table **corebanking.AllObjects** and pushing them to the **Schema Normalization Process**. These messages are pushed synchronously (the service waits for the correct processing of each message) and this is by design, to continue guaranteeing the proper sequencing of messages.
+
+The process will then use the message schema full name to query table **SchemaNormalization.SchemaKeyMapConfig** which will tell the process what is the DTL (data transformation language) class to be used to that particular message to normalized it to the canonical schema. This is another very important table to be aware of.
+
+The **Schema Normalization Process** is a generic process that can be used to normalize any Kafka/AVRO message as long as the messages sent to it have its schema configured in **SchemaNormalization.SchemaKeyMapConfig** and the proper DTLs are created and available to the process to use.
+
+If a problem occurs during the normalization process, the entire processing will **temporarily pause** and an **alert** will be sent to the application specialist role (a data steward). A **workflow ticket** will also be created to make sure the proper timing of resulution is measured. This person will be able to see the problem, use InterSystems IRIS visual trace capabilities to understand what is happening, fix the issue and decide if this message should be retried or discarded. The processing of messages will then resume.
+
+Temporarily pausing the processing of messages is paramount for proper message sequencing and to gurantee data quality. Other more advanced options can be implemented such as pausing all processing just for messages involved the same customer that was affected. 
+
 ## Where is the canonical model
 
-This demo maps two schemas to a single canonical model. The canonical model is comprised of just one class: **Canonical.Customer**. If you click on the gren square at the right on the demo landing page that reads **Canonical Customer** you will be taken to a place where you can run SQL queries like:
+As explained, the **Schema Normalization Process** will pick the right DTL transformations to structurally and semantically normalize messages coming from Kafka to the canonical model that we are making available for users.
+
+If you click on the gren square at the right on the demo landing page or at the SQL arrow at the far right, you will be taken to a place where you can run SQL queries like:
 
 ```SQL
 select * from Canonical.Customer
