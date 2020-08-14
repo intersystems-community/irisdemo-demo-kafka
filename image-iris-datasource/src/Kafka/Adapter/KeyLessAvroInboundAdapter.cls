@@ -18,26 +18,27 @@ Property %remoteClassname As %String [ InitialExpression = "irisdemo.kafka.KeyLe
 
 Property KeyDeserializerClassName As Kafka.Datatype.Deserializer [ InitialExpression = "org.apache.kafka.common.serialization.ByteArrayDeserializer", Required ];
 
-Property SchemaRegistryURL As %String(MAXLEN = "") [ InitialExpression = "http://localhost:8081" ];
+Property SchemaRegistryConfig As %String;
 
-Property StorageClassName As %String(MAXLEN = "");
+Property SchemaRegistryConfigObj As SchemaRegistry.Config;
 
-/// Data will always be saved directly on the global storage of the class for the avro schema
-/// You can optionally configure the adapter to call your Business Process ProcessInput() method
-/// to let you know that new data has arrived. That call will be done on every CallInterval IF new data
-/// has arrived.
-Property CallProcessInputUponNewData As %Boolean [ InitialExpression = 0 ];
-
-Parameter SETTINGS = "StorageClassName:Basic:selector?context={SchemaRegistry.Monitor.ContextSearch/Schemas},SchemaRegistryURL:Basic,CallProcessInputUponNewData,KeyDeserializerClassName";
+Parameter SETTINGS = "SchemaRegistryConfig:Basic:selector?context={SchemaRegistry.Monitor.ContextSearch/Configs},KeyDeserializerClassName";
 
 Method OnInit() As %Status
 {
-    Do ..AddRemoteSetting("SCHEMA_REGISTRY", ..SchemaRegistryURL)
+    Do ..AddRemoteSetting("SCHEMA_REGISTRY", ..SchemaRegistryConfigObj.EndPoint)
     Do ..AddRemoteSetting("CALL_PROCESS_INPUT_UPON_NEW_DATA", ..CallProcessInputUponNewData)
     Do ..AddRemoteSetting("KEY_DESERIALIZER_CLASS_CONFIG", ..KeyDeserializerClassName)
-    Do ..AddRemoteSetting("STORAGE_CLASS_NAME", ..StorageClassName)
+    Do ..AddRemoteSetting("STORAGE_BASE_PACKAGE_NAME", $Translate(..SchemaRegistryConfigObj.Name,"."))
 
 	Quit ##super()
+}
+
+Method SchemaRegistryConfigSet(pSchemaRegistryConfigName As %String) As %Status
+{
+    Set tSC = $$$OK
+    Set ..SchemaRegistryConfigObj = ##class(SchemaRegistry.Config).NameIndexOpen(pSchemaRegistryConfigName,,.tSC)
+    Quit tSC
 }
 
 }

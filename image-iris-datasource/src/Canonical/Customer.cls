@@ -1,13 +1,19 @@
-Class Canonical.Customer Extends (%Persistent, DataSink.CanonicalData)
+Class Canonical.Customer Extends (%Persistent, SchemaNormalization.NormalizedData)
 {
 
-Property AccountId As %String [ Required ];
+Property AsOf As %TimeStamp [ Required ];
+
+Property CustomerID As %BigInt [ Required ];
+
+Property PhoneNumber As %String [ Required ];
 
 Property FullName As %String [ Required ];
 
-Property DateOfBirth As %Date [ Required ];
-
 Property Address As Address;
+
+Property CheckingAccount As CheckingAccount;
+
+Index CustomerIDIndex On CustomerID [ PrimaryKey ];
 
 Storage Default
 {
@@ -19,25 +25,25 @@ Storage Default
 <Value>%SessionId</Value>
 </Value>
 <Value name="3">
-<Value>%DataSourceName</Value>
-</Value>
-<Value name="4">
-<Value>%DTL</Value>
-</Value>
-<Value name="5">
 <Value>%VersionDateTime</Value>
 </Value>
-<Value name="6">
-<Value>AccountId</Value>
+<Value name="4">
+<Value>PhoneNumber</Value>
 </Value>
-<Value name="7">
+<Value name="5">
+<Value>FullName</Value>
+</Value>
+<Value name="6">
 <Value>Address</Value>
 </Value>
+<Value name="7">
+<Value>CheckingAccount</Value>
+</Value>
 <Value name="8">
-<Value>DateOfBirth</Value>
+<Value>AsOf</Value>
 </Value>
 <Value name="9">
-<Value>FullName</Value>
+<Value>CustomerID</Value>
 </Value>
 </Data>
 <DataLocation>^Canonical.CustomerD</DataLocation>

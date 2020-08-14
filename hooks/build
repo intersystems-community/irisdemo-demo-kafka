@@ -18,7 +18,10 @@ source ./buildtools.sh
 # But we need to start with an empty file:
 rm -f ./images_built
 
-(cd ./image-iris-datasource && ./build.sh)
+cd ./image-iris-datasource
+./build.sh
+exit_if_error
+cd ..
 
 build_java_project "image-master"
 

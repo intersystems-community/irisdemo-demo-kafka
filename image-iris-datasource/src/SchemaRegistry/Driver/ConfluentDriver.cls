@@ -10,28 +10,33 @@ Method GetSchemas(Output pSchemas) As %Status
         Quit:$$$ISERR(tSC)
 
         Set schemaSubject = ""
-        Set iSchema=0
+        Set topic=""
 
         For 
         {
-            Set schemaSubject = $Order(arSchemaSubjects(schemaSubject))
-            Quit:schemaSubject=""
+            Set iSchema=0
 
-            Set tSC = ..DownloadSchemaSubjectVersions(schemaSubject, .versions)
-            Quit:$$$ISERR(tSC)
+            Set topic = $Order(arSchemaSubjects(topic))
+            Quit:topic=""
 
-            Set version=""
-            For
+            For 
             {
-                Set version=$Order(versions(version))
+                Set schemaSubject = $Order(arSchemaSubjects(topic, schemaSubject))
+                Quit:schemaSubject=""
+
+                Set tSC = ..DownloadSchemaSubjectVersions(schemaSubject, .versions)
+                Quit:$$$ISERR(tSC)
+
+                //Taking only the last version
+                Set version=$Order(versions(""), -1)
                 Quit:version=""
 
                 Set tSC = ..DownloadSchema(schemaSubject, version, .arSchema)
                 Quit:$$$ISERR(tSC)
 
                 Set iSchema=iSchema+1
-                Merge pSchemas(iSchema)=arSchema
-            }            
+                Merge pSchemas(topic, iSchema)=arSchema
+            }      
         }
     }
     Catch (oException)
@@ -53,23 +58,46 @@ Method DownloadSchemaSubjects(Output arSchemaSubjects) As %Status [ Private ]
 
         Set topicsArray = [].%FromJSON(response)
         Set iterator = topicsArray.%GetIterator()
-        While iterator.%GetNext(.key, .value)
+        While iterator.%GetNext(.valueIndex, .value)
         {
-            If $Extract(value,*-$Length(..Config.ValueSchemaSuffix)+1,*)=..Config.ValueSchemaSuffix 
-            {
-                Set topic = $Piece(value, "-", 1, *-1)
-                Set schemaSubject = value
+            // See: https://www.confluent.io/blog/put-several-event-types-kafka-topic/
 
-                Set arSchemaSubjects(schemaSubject)=""
-            }
-            ElseIf $Extract(value,*-$Length(..Config.KeySchemaSuffix)+1,*)=..Config.KeySchemaSuffix 
+            /*
+            io.confluent.kafka.serializers.subject.TopicNameStrategy (default): The subject name for message keys is <topic>-key, 
+            and <topic>-value for message values. This means that the schemas of all messages in the topic must be compatible with each other.
+            */
+            If ..Config.SubjectNamingStrategy="TopicNameStrategy"
             {
-                // Key schemas are not supported for now
+                If $Piece(value,"-",*)="value"
+                {
+                    Set topic = $Piece(value, "-", 1, *-1)
+                    Set schemaSubject=value
+                    Set arSchemaSubjects(topic, schemaSubject)=""
+                }
+                ElseIf $Piece(value,"-",*)="key"
+                {
+                    // Not supporting key-based schema as of now
+                }
             }
-            Else
+            /*
+            io.confluent.kafka.serializers.subject.RecordNameStrategy: The subject name is the fully-qualified name of the Avro record 
+            type of the message. Thus, the schema registry checks the compatibility for a particular record type, regardless of topic. 
+            This setting allows any number of different event types in the same topic.
+            */
+            ElseIf ..Config.SubjectNamingStrategy="RecordNameStrategy"
             {
-                // Why would we ever care about a topic without a schema?
+                Set arSchemaSubjects(..Config.Name,value)=""
             }
+            /*
+            io.confluent.kafka.serializers.subject.TopicRecordNameStrategy: The subject name is <topic>-<type>, where <topic> is the Kafka
+            topic name, and <type> is the fully-qualified name of the Avro record type of the message. This setting also allows any number 
+            of event types in the same topic, and further constrains the compatibility check to the current topic only.
+            */
+            ElseIf ..Config.SubjectNamingStrategy="TopicRecordNameStrategy"
+            {
+                //Not supported right now
+            }
+            
         }
     }
     Catch (oException)

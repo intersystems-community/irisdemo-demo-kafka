@@ -32,7 +32,7 @@ else
     # It will download all the dependencies of the project
     docker run -i \
         -v ${PROJECT_FOLDER}:/usr/projects \
-        --name $COMPILER_CONTAINER intersystemsdc/irisdemo-base-mavenc:version-1.4.0
+        --name $COMPILER_CONTAINER intersystemsdc/irisdemo-base-mavenc:version-1.5.0
     exit_if_error "Could not create and run container $COMPILER_CONTAINER"
 fi
 

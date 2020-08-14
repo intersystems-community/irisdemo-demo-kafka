@@ -115,6 +115,7 @@ public class KafkaWorker implements IWorker
 		logger.info("Ingestion worker #"+threadNum+" started. Sending messages to topics... ");
 
 		// amountDays, amountEvents, amountCustomers
+		logger.info("Creating simulator with amountDays="+config.getBankSimDays()+", maxNumberOfEvents="+config.getBankSimNumEvents()+", amountCustomers="+config.getBankSimNumCustomers()+".");
 		Simulator simulator = new Simulator(config.getBankSimDays(), config.getBankSimNumEvents(), config.getBankSimNumCustomers());
 		//Simulator simulator = new Simulator(30, 5000000, 50000);
 		
@@ -138,26 +139,27 @@ public class KafkaWorker implements IWorker
 
 					if (avroEvent == null) 
 					{
+						logger.warn("Simulation stopped. No more events returned.");
 						break;
 					}
 					else if (avroEvent instanceof TransferAvroEvent)
 					{
-						transfersRecord = new ProducerRecord<Long, TransferAvroEvent>(transferTopic, (Long)avroEvent.getPartitionKey(), (TransferAvroEvent)avroEvent);
+						transfersRecord = new ProducerRecord<Long, TransferAvroEvent>(transferTopic, (Long)avroEvent.get("customerId"), (TransferAvroEvent)avroEvent);
 						producer.send(transfersRecord);
 					}
 					else if (avroEvent instanceof DemographicsAvroEvent)
 					{
-						demographicsRecord = new ProducerRecord<Long, DemographicsAvroEvent>(demographicsTopic, (Long)avroEvent.getPartitionKey(), (DemographicsAvroEvent)avroEvent);
+						demographicsRecord = new ProducerRecord<Long, DemographicsAvroEvent>(demographicsTopic, (Long)avroEvent.get("customerId"), (DemographicsAvroEvent)avroEvent);
 						producer.send(demographicsRecord);
 					}
 					else if (avroEvent instanceof LoanContractAvroEvent)
 					{
-						loanContractsRecord = new ProducerRecord<Long, LoanContractAvroEvent>(loanContractsTopic, (Long)avroEvent.getPartitionKey(), (LoanContractAvroEvent)avroEvent);
+						loanContractsRecord = new ProducerRecord<Long, LoanContractAvroEvent>(loanContractsTopic, (Long)avroEvent.get("customerId"), (LoanContractAvroEvent)avroEvent);
 						producer.send(loanContractsRecord);
 					}
 					else if (avroEvent instanceof NewCustomerAvroEvent)
 					{
-						newCustomerRecord = new ProducerRecord<Long, NewCustomerAvroEvent>(newCustomerTopic, (Long)avroEvent.getPartitionKey(), (NewCustomerAvroEvent)avroEvent);
+						newCustomerRecord = new ProducerRecord<Long, NewCustomerAvroEvent>(newCustomerTopic, (Long)avroEvent.get("customerId"), (NewCustomerAvroEvent)avroEvent);
 						producer.send(newCustomerRecord);
 					}
 					

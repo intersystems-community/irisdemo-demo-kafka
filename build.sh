@@ -2,18 +2,21 @@
 VERSION=`cat ./VERSION`
 DOCKER_TAG="version-${VERSION}"
 
-source ./buildtools.sh
-
 # funtion build_java_project will add a line with the full image name of each image built
 # But we need to start with an empty file:
 rm -f ./images_built
 
 git submodule update --init --recursive
 
+source ./buildtools.sh
+
 ###############################################################
 # IRIS Data Source Image
 ###############################################################
-(cd ./image-iris-datasource && ./build.sh)
+cd ./image-iris-datasource
+./build.sh
+exit_if_error
+cd ..
 
 ###############################################################
 # Master Image

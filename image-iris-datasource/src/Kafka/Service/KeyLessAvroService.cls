@@ -15,90 +15,11 @@ Class Kafka.Service.KeyLessAvroService Extends Ens.BusinessService
 
 Parameter ADAPTER = "Kafka.Adapter.KeyLessAvroInboundAdapter";
 
-Property TargetConfigName As %String(MAXLEN = "");
-
-Property DataSourceTableName As %String(MAXLEN = "");
-
-Parameter SETTINGS = "TargetConfigName:Basic:selector?context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
-
-/// This method will only be called if the adapter's CallProcessInputUponNewData = 1 and new data has arrived 
-/// If you need to be notified about new data being arrived, you should just create your own business service
-/// with the adapter Kafka.Adapter.SchemaLessInboundAdapter and implement your own OnProcessInput instead of
-/// touching this class.
-Method OnProcessInput(pInput As %RegisteredObject, Output pOutput As %RegisteredObject) As %Status
+Method OnProcessInput(pInput As %RegisteredObject, Output pOutput As %RegisteredObject, pHint As %String) As %Status
 {
-    #Dim oStmtResult As %SQL.StatementResult
-    
-    Set tSC = $$$OK
-    Try
-    {
-		Quit:..TargetConfigName=""
-
-        If ..DataSourceTableName=""
-        {
-            Set tSC=..FindDataSourceTableName()
-            Quit:$$$ISERR(tSC)
-        }
-
-        Set tSQL = "select %ID from "_..DataSourceTableName_" where %ProcessingStatus = 'PEND'"
-        
-        Set oStmtResult = ##class(%SQL.Statement).%ExecDirect(, tSQL)
-        If oStmtResult.%SQLCODE'=0
-        {
-            Set tSC = $$$ERROR(5001,"Error trying to fetch data: "_oStmtResult.%Message)
-            Quit
-        }
-
-        While oStmtResult.%Next()
-        {
-            Set id = oStmtResult.%GetData(1)
-            Set obj = $classmethod(..Adapter.StorageClassName,"%OpenId",id)
-
-            Set ..%SessionId=""
-            Do ..ForceSessionId()
-
-            Set tSC = ..SendRequestAsync(..TargetConfigName, obj)
-            Quit:$$$ISERR(tSC)
-
-            Set obj.%ProcessingStatus="PROC"
-            Set obj.%SessionId=..%SessionId
-            Set tSC = obj.%Save()
-            Quit:$$$ISERR(tSC)
-
-            
-        }
-        
-    }
-    Catch (oException)
-    {
-        Set tSC = oException.AsStatus()
-    }
-
-	If $$$ISERR(tSC)
-	{
-		$$$LOGSTATUS(tSC)
-	}
-    
-    Quit tSC
-}
-
-Method FindDataSourceTableName() As %Status
-{
-    Set oCompiledClass = ##class(%Dictionary.CompiledClass).%OpenId(..Adapter.StorageClassName,,.tSC)
-    Quit:$$$ISERR(tSC) tSC
-
-    Set ..DataSourceTableName = oCompiledClass.SqlSchemaName_"."_oCompiledClass.SqlTableName
-
-    Quit $$$OK
-}
-
-ClassMethod OnGetConnections(Output pArray As %String, pItem As Ens.Config.Item)
-{
-    Do ##super(.pArray,pItem)
-    If pItem.GetModifiedSetting("TargetConfigName",.tValue) 
-    {
-        Set pArray(tValue)=""
-    }
+    Set tClassName = $ListGet(pInput, 1)
+    Set tJSON = $ListGet(pInput, 2)
+    Quit $classmethod(tClassName, "ParseJSONAndSave", tJSON)
 }
 
 }

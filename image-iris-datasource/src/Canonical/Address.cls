@@ -7,7 +7,7 @@ Property StateDescription As %String [ Required ];
 
 Property City As %String [ Required ];
 
-Property Street As %String [ Required ];
+Property Street As %String;
 
 Property Zip As %String;
 

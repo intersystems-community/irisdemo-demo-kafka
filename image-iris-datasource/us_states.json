@@ -253,5 +253,10 @@
     "State": "Wyoming",
     "Abbrev": "Wyo.",
     "Code": "WY"
+  },
+  {
+    "State": "Puerto Rico",
+    "Abbrev": "P.Rico",
+    "Code": "PR"
   }
 ]

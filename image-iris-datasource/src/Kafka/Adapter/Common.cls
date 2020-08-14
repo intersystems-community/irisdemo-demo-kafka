@@ -21,6 +21,12 @@ Property GroupId As %String [ InitialExpression = "iris" ];
 /// beginning (earliest) or just after the last one (latest).
 Property AutoOffsetResetConfig As Kafka.Datatype.AutoOffsetResetOptions [ InitialExpression = "none", Required ];
 
+/// Data will always be saved directly on the global storage of the class for the avro schema
+/// You can optionally configure the adapter to call your Business Process ProcessInput() method
+/// to let you know that new data has arrived. That call will be done on every CallInterval IF new data
+/// has arrived.
+Property CallProcessInputUponNewData As %Boolean [ InitialExpression = 0 ];
+
 Parameter SETTINGS = "-%remoteClassname,-%remoteSettings,-%gatewayExtraClasspaths,KafkaBrokerURL:Basic,Topic:Basic,GroupId:Basic,AutoOffsetResetConfig:Basic";
 
 Method OnInit() As %Status
@@ -30,7 +36,6 @@ Method OnInit() As %Status
     Do ..AddRemoteSetting("GROUP_ID", ..GroupId)
     Do ..AddRemoteSetting("AUTO_OFFSET_RESET_CONFIG", ..AutoOffsetResetConfig)
     Do ..AddRemoteSetting("CALL_INTERVAL", ..CallInterval)
-
 	Quit ##super()
 }
 
@@ -38,7 +43,15 @@ Method OnTask() As %Status
 {
     Set tSC = ##super()
     
-    Set ..BusinessHost.%WaitForNextCallInterval=0
+    If '$$$ISERR(tSC)
+    {
+        Set ..BusinessHost.%WaitForNextCallInterval=0
+    }
+    Else 
+    {
+        Set ..BusinessHost.%WaitForNextCallInterval=1
+    }
+    
 
     Quit tSC
 }

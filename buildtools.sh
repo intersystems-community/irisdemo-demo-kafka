@@ -2,9 +2,25 @@
 
 exit_if_error() {
 	if [ $(($(echo "${PIPESTATUS[@]}" | tr -s ' ' +))) -ne 0 ]; then
-		echo ""
-		echo "ERROR: $1"
-		echo ""
+		if [ ! -z "$1" ];
+		then
+			echo ""
+			echo "ERROR: $1"
+			echo ""
+		fi
+		exit 1
+	fi
+}
+
+go_up_tree_and_exit_if_error() {
+	if [ $(($(echo "${PIPESTATUS[@]}" | tr -s ' ' +))) -ne 0 ]; then
+		if [ ! -z "$1" ];
+		then
+			cd ..
+			echo ""
+			echo "ERROR: $1"
+			echo ""
+		fi
 		exit 1
 	fi
 }
@@ -43,7 +59,7 @@ build_java_project() {
 		# It will download all the dependencies of the project
 		docker run -i \
 			-v ${PROJECTS_FOLDER}:/usr/projects \
-			--name $compilerContainer intersystemsdc/irisdemo-base-mavenc:version-1.4.0
+			--name $compilerContainer intersystemsdc/irisdemo-base-mavenc:version-1.5.0
 		exit_if_error "Could not create and run container $compilerContainer"
 	fi
 

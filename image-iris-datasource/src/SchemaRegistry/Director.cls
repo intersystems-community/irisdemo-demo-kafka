@@ -24,19 +24,25 @@ ClassMethod DonwloadAndApplySchemas(pConfigName As %String) As %Status
         
         Set tSC = $method(driverClass, "GetSchemas", .arSchemas)
 
-        Set iSchema=""
-        For
+        Set topic = ""
+        For 
         {
-            Set iSchema=$Order(arSchemas(iSchema))
-            Quit:iSchema=""
+            Set topic = $Order(arSchemas(topic))
+            Quit:topic=""
 
-            Kill arSchema
-            Merge arSchema=arSchemas(iSchema)
+            Set iSchema=""
+            For
+            {
+                Set iSchema=$Order(arSchemas(topic, iSchema))
+                Quit:iSchema=""
 
-            Set tSC = ##class(SchemaRegistry.SchemaGenerator).CreateOrReplaceClassTree(pConfigName, .arSchema)
-            Quit:$$$ISERR(tSC)
+                Kill arSchema
+                Merge arSchema=arSchemas(topic, iSchema)
+
+                Set tSC = ##class(SchemaRegistry.SchemaGenerator).CreateOrReplaceClassTree(topic, .arSchema)
+                Quit:$$$ISERR(tSC)
+            }
         }
-        
     }
     Catch (oException)
     {

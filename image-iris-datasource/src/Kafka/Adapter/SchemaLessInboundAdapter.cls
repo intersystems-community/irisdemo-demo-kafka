@@ -31,12 +31,6 @@ Property UseKeyAsGlobalSubscript As %Boolean [ InitialExpression = 0, Required ]
 /// just saving the data as a simple value (no $List is needed).
 Property StoreKeyWithData As %Boolean [ InitialExpression = 0, Required ];
 
-/// Data will always be saved directly on the global named after the topic. 
-/// You can optionally configure the adapter to call your Business Process ProcessInput() method
-/// to let you know that new data has arrived. That call will be done on every CallInterval IF new data
-/// has arrived.
-Property CallProcessInputUponNewData As %Boolean [ InitialExpression = 0 ];
-
 Parameter SETTINGS = "KeyDeserializerClassName:Basic,ValueDeserializerClassName:Basic,UseKeyAsGlobalSubscript,StoreKeyWithData";
 
 Method OnInit() As %Status

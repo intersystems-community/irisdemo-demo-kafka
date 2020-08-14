@@ -1,0 +1,218 @@
+package irisdemo.kafka;
+
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.common.serialization.*;
+import com.intersystems.enslib.pex.InboundAdapter;
+import com.intersystems.jdbc.IRISList;
+import java.util.Collections;
+import java.util.Properties;
+import java.time.Duration;
+
+public class SchemaLessInboundAdapter extends com.intersystems.enslib.pex.InboundAdapter implements Runnable
+{
+	Thread consumerThread = null;
+	boolean keepRunning = true;
+
+	private Consumer<Object,Object> consumer;
+
+	public static String TOPIC;
+	public static String TOPIC_GLOBAL;
+	public static String BOOTSTRAP_SERVERS;
+	public static String GROUP_ID;
+	public static String VALUE_DESERIALIZER_CLASS_CONFIG;
+	public static String KEY_DESERIALIZER_CLASS_CONFIG;
+	public static boolean USE_KEY_AS_GLOBAL_SUBSCRIPT = false;
+	public static boolean STORE_KEY_WITH_DATA = false;
+	public static boolean CALL_PROCESS_INPUT_UPON_NEW_DATA = false;
+	public static String AUTO_OFFSET_RESET_CONFIG;
+	public static int CALL_INTERVAL = 5;
+
+	// Used inside run() method
+	private static boolean succesfulDeserializationOfBatch = true;
+	private static Exception thrownExceptionDuringDeserialization;
+	private boolean newDataHasArrived = true;
+
+	private Consumer<Object, Object> createConsumer() throws Exception
+	{
+		final Properties props = new Properties();
+
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
+		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, AUTO_OFFSET_RESET_CONFIG);
+		try
+		{
+			props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, Class.forName(KEY_DESERIALIZER_CLASS_CONFIG).getName());
+		}
+		catch (ClassNotFoundException e)
+		{
+			this.LOGERROR("Invalid KEY deserializer class: " +  KEY_DESERIALIZER_CLASS_CONFIG);
+			throw e;
+		}
+
+		try
+		{
+			props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, Class.forName(VALUE_DESERIALIZER_CLASS_CONFIG).getName());
+		}
+		catch (ClassNotFoundException e)
+		{
+			this.LOGERROR("Invalid VALUE deserializer class: " +  VALUE_DESERIALIZER_CLASS_CONFIG);
+			throw e;
+		}
+
+		// Create the consumer using props.
+		final Consumer<Object, Object> consumer = new KafkaConsumer<>(props);
+      
+		// Subscribe to the topic.
+		consumer.subscribe(Collections.singletonList(TOPIC));      
+		
+		return consumer;
+	}
+	
+
+	@Override
+	public void OnInit() throws Exception 
+	{
+		this.consumer = createConsumer();
+		startConsumerThread();
+	}
+	
+	public void startConsumerThread()
+	{
+		consumerThread = new Thread(this, "Kafka Consumer Thread");
+		consumerThread.start();
+	}
+
+	@Override
+	public void run() 
+	{
+		LOGINFO("Starting consumer thread.");
+		LOGINFO("USE_KEY_AS_GLOBAL_SUBSCRIPT: " + USE_KEY_AS_GLOBAL_SUBSCRIPT);
+		LOGINFO("STORE_KEY_WITH_DATA: " + STORE_KEY_WITH_DATA);
+		LOGINFO("VALUE_DESERIALIZER_CLASS_CONFIG: " + VALUE_DESERIALIZER_CLASS_CONFIG);
+		LOGINFO("KEY_DESERIALIZER_CLASS_CONFIG: " + KEY_DESERIALIZER_CLASS_CONFIG);
+
+		ConsumerRecords<Object, Object> consumerRecords;
+		IRISList list = new IRISList();
+
+		while (keepRunning) 
+		{
+			consumerRecords = consumer.poll(Duration.ofMillis(1000));
+			succesfulDeserializationOfBatch = true;
+			//BusinessHost.irisHandle.iris.tStart();
+
+			if (USE_KEY_AS_GLOBAL_SUBSCRIPT)
+			{
+
+				consumerRecords.forEach(record -> 
+				{
+					newDataHasArrived = true;
+					
+					try 
+					{
+						BusinessHost.irisHandle.iris.set(record.value(), TOPIC_GLOBAL, record.key());
+					} 
+					catch (Exception e) 
+					{
+						keepRunning = false;
+						succesfulDeserializationOfBatch = false;
+						thrownExceptionDuringDeserialization = e;
+					}
+					
+				});
+			}
+			else
+			{
+				consumerRecords.forEach(record -> 
+				{
+					newDataHasArrived = true;
+					
+					try 
+					{
+						if (STORE_KEY_WITH_DATA)
+						{
+							list.add(record.key());
+						}
+						list.add(record.value());
+						
+						long next = BusinessHost.irisHandle.iris.increment(1, TOPIC_GLOBAL);
+						BusinessHost.irisHandle.iris.set(list, TOPIC_GLOBAL, next);
+
+						list.clear();
+					} 
+					catch (Exception e) 
+					{
+						keepRunning = false;
+						succesfulDeserializationOfBatch = false;
+						thrownExceptionDuringDeserialization = e;
+					}
+					
+				});
+			}
+			
+			if (succesfulDeserializationOfBatch)
+			{
+				//BusinessHost.irisHandle.iris.tCommit();
+				consumer.commitSync();
+			}
+			else
+			{
+				//BusinessHost.irisHandle.iris.tRollback();
+				LOGINFO("Rolling back inserted records in IRIS.");
+			}
+		}
+
+		if (thrownExceptionDuringDeserialization!=null)
+			LOGERROR(thrownExceptionDuringDeserialization.getMessage()+"\n"+thrownExceptionDuringDeserialization.getStackTrace());					
+
+		LOGINFO("Consumer thread finished.");
+	}
+
+	public void stopConsumerThread()
+	{
+		LOGINFO("Stopping consumer thread.");
+		keepRunning = false;
+		try
+		{
+			consumerThread.join();
+		}
+		catch (InterruptedException e)
+		{}
+
+		consumer.close();
+	}
+
+	@Override
+	public void OnTask() throws Exception 
+	{
+		if (CALL_PROCESS_INPUT_UPON_NEW_DATA && this.newDataHasArrived)
+		{
+			BusinessHost.ProcessInput("");
+			newDataHasArrived = false;
+		}
+
+		// We must sleep here. If we let the sleep happen on the IRIS side
+		// our child thread will not be able to save objects on IRIS fast enough 
+		// because the java side will be trying to READ over the connection to know when 
+		// to wake up and while this is happening, the child thread can not WRITE over
+		// the connection to save objects.
+		Thread.sleep(CALL_INTERVAL*1000);
+
+		/* 
+		If you are asking, I could move the code on run() to OnTask, but that causes another problem.
+		OnTask must return to Ensemble periodically. So we would have to decide on how many messages we want
+		to fetch on each OnTask call before returning. Or simply take note of the current time and let the while
+		loop that fetchs messages from kafka to run for just that amount of time and return. 
+		I like the later approach and I may just implemented it later. But if we could solve the issue that
+		is blocking the run() method when it is trying to call IRIS while the OnTask loop is sleeping, we could
+		be so much faster... It is a thing to think about. 
+		*/
+	}
+
+	@Override
+	public void OnTearDown() throws Exception 
+	{
+		stopConsumerThread();
+	}
+
+}

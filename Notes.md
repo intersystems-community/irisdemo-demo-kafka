@@ -43,3 +43,39 @@ Tutorial: https://docs.confluent.io/current/schema-registry/schema_registry_tuto
 
 Vailable SerDes:
 - https://docs.confluent.io/current/streams/developer-guide/datatypes.html
+
+
+
+Get a customer with many movements
+
+select Account->AccountNumber, count(ID) as movements
+
+from Canonical.CheckingAccountMov
+
+group by Account->AccountNumber
+order by movements desc
+
+
+Get a customer with movements that include loans:
+
+select mov.Account->AccountNumber, count(mov.ID) as movements
+
+from Canonical.CheckingAccountMov mov, Canonical.LoanContract loan
+
+where mov.Account->Customer = loan.Customer
+
+group by mov.Account->AccountNumber
+order by movements desc
+
+
+
+Get a Customer's balance
+
+select cust.FullName, cust.CheckingAccount->AccountNumber, cust.CheckingAccount->OpeningBalance, mov.MovementDate, mov.MovementType, mov.LoanContract, mov.Reference, mov.TransferId, mov.Amount, mov.AccountBalance
+
+from Canonical.CheckingAccountMov mov, Canonical.Customer cust
+
+where mov.Account= cust.CheckingAccount
+
+and mov.Account->AccountNumber= '0022678' 
+order by mov.MovementDate
