@@ -34,7 +34,7 @@ After all the containers have started, open a browser at [http://localhost:10001
 
 You are going to see a page like this:
 
-![Architecture of Demo](https://raw.githubusercontent.com/intersystems-community/irisdemo-demo-restm2/master/image-iris-data-sink/html/landing-page.png?token=ABQT2JHSY2U75QPOHEBDOAS7BKPEE)
+![Architecture of Demo](https://raw.githubusercontent.com/intersystems-community/irisdemo-demo-kafka/master/image-iris-datasource/html/landing-page.png)
 
 This is the landing page of the demo. Everything on this image is clickable. The **data simulator** is at the left of the image. Just click on its square to open it. It is capable of generating the **AVRO** messages and send them to Kafka. Here is an example of the UI of the simulator:
 
