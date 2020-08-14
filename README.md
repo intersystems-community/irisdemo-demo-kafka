@@ -3,18 +3,18 @@
 Demo of InterSystems IRIS with Kafka, Schema Registry, AVRO and Schema Migration
 
 This demo allows you to show:
-- Ingestion of **AVRO** documents over Kafka
-- InterSystems IRIS **Multi-model** capabilities (JSON, Objects and SQL)
-- How InterSystems IRIS can **transform** the JSON object into a canonical structure using transformations and **lookups**
+- A Bank Simulator generating AVRO messages and sending them over Kafka to InterSystems IRIS
+- InterSystems IRIS **Multi-model** capabilities (AVRO, JSON, Objects, SQL and MDX)
+- How InterSystems IRIS can **transform** the AVRO object into a canonical structure using transformations and **lookups**
 - How InterSystems IRIS can **orchestrate** this work and start a **human workflow** in case of a problem during the transformations
 - How InterSystems IRIS can provide bidirectional **data lineage** (from source to canonical and vice-versa)
-- How InterSytems IRIS can do **schema evolution** by allowing developers to keep adding new schemas while maintaining proper data lineage
-- When configured in batch mode, how InterSystems IRIS can ingest documents at **high speed**
+- How InterSytems IRIS pull new schemas from a Kafka Schema Registry and generate the data structures automatically to support **schema evolution**
 
+This demo uses Confluent's Kafka and their docker-compose sample.
 
 ## How to run the demo
 
-**WARNING: If you are running on a Mac or Windows, you must give Docker at least 3Gb of RAM for this demo to run properly. Also, please check this [troubleshooting](https://github.com/intersystems-community/irisdemo-base-troubleshooting) document in case you find problems starting the demo with docker-compose. Disk space available for the docker VM is the most common cause for trouble.**
+**WARNING: If you are running on a Mac or Windows, you must give Docker at least 5Gb of RAM for this demo to run properly. Also, please check this [troubleshooting](https://github.com/intersystems-community/irisdemo-base-troubleshooting) document in case you find problems starting the demo with docker-compose. Disk space available for the docker VM is the most common cause for trouble.**
 
 To run the demo on your PC, make sure you have **Git** and **Docker** installed on your machine. 
 
@@ -32,47 +32,11 @@ When it is done, it will just hang there, without returning control to you. That
 
 After all the containers have started, open a browser at [http://localhost:10001/csp/appint/demo.csp](http://localhost:10001/csp/appint/demo.csp) to see the landing page of the demo. When requested, use the credentials **SuperUser/sys** to log in. 
 
-## What is in the package?
-
-On this demo, we use a data simulator to generate REST calls to IRIS. The simulator can be configured to send the REST calls following two different JSON schemas: v1 and v2. Here is an example of the JSON sent using v1:
-
-```JSON
-{
-    "account_id": "W1B1",
-    "name": "Sandy Yapp",
-    "dob": "1992-12-31",
-    "address": {
-        "state": "DE",
-        "city": "Cambridge",
-        "street": "Ent Boulevard"
-    }
-}
-```
-
-And here is an example of v2:
-```JSON
-{
-    "account_id": "W1A1",
-    "fullName": "Vivian Campbell",
-    "dob": "1942-03-02",
-    "address": {
-        "state": "OH",
-        "city": "Orlando",
-        "street": "Lime Way",
-        "zip": "9KMZB"
-    }
-}
-```
-
-As you can see, the two JSON documents are very similar. The idea is to show how IRIS can deal with **Schema Evolution** when ingesting JSON documents over REST. On schema v2, **name** has been renamed to **fullName** and the **address** now contains an additional field called **zip**.
-
-Here is the architecture of the demo:
+You are going to see a page like this:
 
 ![Architecture of Demo](https://raw.githubusercontent.com/intersystems-community/irisdemo-demo-restm2/master/image-iris-data-sink/html/landing-page.png?token=ABQT2JHSY2U75QPOHEBDOAS7BKPEE)
 
-This is the landing page of the demo. The one you opened just after you started the demo with **docker-compose up**. Everything on this image is clickable. 
-
-The data simulator is at the left of the image. Just click on its square to open it. It is capable of generating the JSON documents and send it to InterSystems IRIS. Here is an example:
+This is the landing page of the demo. Everything on this image is clickable. The **data simulator** is at the left of the image. Just click on its square to open it. It is capable of generating the **AVRO** messages and send them to Kafka. Here is an example of the UI of the simulator:
 
 ![Simulator Running](https://raw.githubusercontent.com/intersystems-community/irisdemo-demo-restm2/master/img/simulator_running.png?token=ABQT2JGV7XTUYBIKAOZK3O27BKTCE)
 
@@ -80,28 +44,85 @@ After clicking on **Run Test** on the simulator, go back to the demo landing pag
 
 ![Data Lineage](https://raw.githubusercontent.com/intersystems-community/irisdemo-demo-restm2/master/img/visual_trace.png?token=ABQT2JHK5JT3ED4HROQXOB27BKTRY)
 
-## REST Endpoints x Original Data Repositories
 
-Here is the list of endpoints in this demo on InterSystems IRIS:
+## Types of Messages Generated by the Simulator
 
-- /csp/appint/v1 - POST: Add a new document to the v1 repository
-- /csp/appint/v1/id - GET: Retrieve a document from the v1 repository
-- /csp/appint/v2 - POST: Add a new document to the v2 repository
-- /csp/appint/v2/id - GET: Retrieve a document from the v2 repository
+On this demo, we use a bank data simulator to generate AVRO messages and send them over Kafka to InterSystems IRIS. The simulator is driven by a simple UI. Once you start the docker-compose accordingly to instructions above, you can open the Simulator UI directly by clicking here: [http://localhost:10000](http://localhost:10000) or using the demo landing page as described above.
 
-Both endpoints (for v1 and v2) can be used. Each endpoint stores the JSON data on its own data repository inside IRIS (a table). Each repository has its own data transformation that will:
-- Map the custom structure to the canonical structure
-- Apply lookups to transform coded fields to the standard reference data (x-ref)
+Here are examples of the AVRO messages sent by the simulator in JSON format so you can see them.
 
-Here are the classes/tables for each repository inside IRIS:
-- Schema v1 - Original.V1.Customer
-- Schema v2 - Original.V2.Customer
+#### corebanking.com.irisdemo.banksim.avroevent.NewCustomerAvroEvent
+```JSON
+{
+    "accountNumber":"0000002",
+    "address": 
+    { 
+        "city":"York",
+        "phone":"2989549246",
+        "state":"NJ"
+    },
+    "customerId":3,
+    "eventDate":"2020-06-15T00:15:29.904Z",
+    "eventId":2,
+    "initialAmount":96862.53125,
+    "name":"Oswald Newman"
+}
+```
 
-If you open these two classes using VSCode or Atelier, you will notice that the follow the JSON schemas at the beginning of this README.
+A message like this can be seen by starting the simulator and then, after waiting for a couple of seconds, you can click here:
+
+http://127.0.0.1:10001/csp/appint/rest/data/corebanking.com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/2
+
+
+#### corebanking.com.irisdemo.banksim.avroevent.DemographicsAvroEvent
+
+```JSON
+{
+    "address":
+    {
+        "city":"New Boston",
+        "phone":"5939642280",
+        "state":"OR"
+    },
+    "customerId":43693,
+    "eventDate":"2020-06-15T00:15:31.904Z",
+    "eventId":50003,
+    "name":"Yusef Lopez"
+}
+
+```
+
+#### corebanking_com_irisdemo_banksim_avroevent.LoanContractAvroEvent
+
+```JSON
+{
+    "account":"0036270",
+    "amount":4778,
+    "contractId":100001,
+    "customerId":72539,
+    "eventDate":"2020-06-15T00:15:32.904Z",
+    "eventId":50004
+}
+```
+
+#### corebanking_com_irisdemo_banksim_avroevent.TransferAvroEvent
+
+```JSON
+{
+    "amount":-43294.621410429550451,
+    "customerAccount":"0007064",
+    "customerId":14127,
+    "eventDate":"2020-06-15T00:15:30.904Z",
+    "eventId":50001,
+    "otherAccount":"0031793",
+    "reference":"",
+    "transferType":"TRANSFER_OUT"
+}
+```
 
 ## Where is the canonical model
 
-This demo maps two schemas to a single canonical model. The canonical model is comprised of just one class: **Canonical.Customer**. If you click on the gren square at the right on the demo landing page that reads **Versioned Canonical Customer** you will be taken to a place where you can run SQL queries like:
+This demo maps two schemas to a single canonical model. The canonical model is comprised of just one class: **Canonical.Customer**. If you click on the gren square at the right on the demo landing page that reads **Canonical Customer** you will be taken to a place where you can run SQL queries like:
 
 ```SQL
 select * from Canonical.Customer
@@ -109,35 +130,55 @@ select * from Canonical.Customer
 
 If you run this query before starting the simulator, this table will be empty. If you run it after, the table will show the canonical records.
 
-You can also run othe queries to look into the original data store for the two schemas such as:
+Here are other queries you can run after you start sending messages to InterSystems IRIS:
 
+#### How many messages have InterSystems IRIS received and what are their status
 ```SQL
-select * from Original_V1.Customer
+SELECT 
+ %ProcessingStatus, count(ID) 
+FROM corebanking.AllObjects
+group by  %ProcessingStatus 
+
 ```
 
-And:
+#### Find customers that have many bank transactions
 
 ```SQL
-select * from Original_V2.Customer
+select Account->AccountNumber, count(ID) as movements
+from Canonical.CheckingAccountMov
+group by Account->AccountNumber
+order by movements desc
+```
+
+#### Find customers that have many bank transactions and has loans
+
+```SQL
+select mov.Account->AccountNumber, count(mov.ID) as movements
+from Canonical.CheckingAccountMov mov, Canonical.LoanContract loan
+where mov.Account->Customer = loan.Customer
+group by mov.Account->AccountNumber
+order by movements desc
+```
+
+#### Get a Customer's checking account balance
+
+```SQL
+select cust.FullName, cust.CheckingAccount->AccountNumber, cust.CheckingAccount->OpeningBalance, mov.MovementDate, mov.MovementType, mov.LoanContract, mov.Reference, mov.TransferId, mov.Amount, mov.AccountBalance
+from Canonical.CheckingAccountMov mov, Canonical.Customer cust
+where mov.Account= cust.CheckingAccount
+and mov.Account->AccountNumber= '0022678' 
+order by mov.MovementDate
 ```
 
 ## Human Workflow
 
-The work of transforming the original documents to its canonical form is orchestrated by the **Normalization Process**. If the message can not be transformed into the canonical format, the normalization process will start a new **workflow** task so that an application specialist can intervene. 
+The work of transforming the original documents to its canonical form is orchestrated by the **Schema Normalization Process**. If the message can not be transformed into the canonical format, the normalization process will start a new **workflow** task so that an application specialist can intervene. 
 
-You will find no problems with v1 documents sent by the simulator. If you configure the simulator to produce **v2 messages**, one every 5000 messages will come with an invalid State. That is on purpose. This will cause a problem on the transformation and it will trigger the workflow.
+Until the application specialist intervene, the processing of messages is interrupted in order to guarantee the integrity of the canonical model.
 
-To configure the simulator to generate v2 messages, click on **Settings** at the top right. Here is the screen for configuring the simulator for schema version v2:
+A simple way to cause a problem is to remove a country from the [lookup table](http://localhost:10001/csp/appint/EnsPortal.LookupSettings.zen?LookupTable=US_States_Code_To_Desc.lut) and watch the [workflow inbox](http://localhost:10001/csp/appint/_DeepSee.UserPortal.Workflow.zen) for a ticket to appear. 
 
-![Configuring Schema Version](https://raw.githubusercontent.com/intersystems-community/irisdemo-demo-restm2/master/img/simulator_configuring_schema_version.png?token=ABQT2JDNCXBDOED5LP65LDC7BKQZC)
-
-Change **REST Schema** to "v2" and click on **Update Configuration**. Now you can click again on **Run Test** to start sending InterSystems IRIS JSON documents with schema v2.
-
-To see the workflow tickets appearing in your workflow inbox, just click on the workflow inbox at the demo landing page.
-
-## Faster!
-
-The simulator **settings** allow you to configure the **Ingestion Batch Size**. It comes with a default value of 1 which is very slow. It is good for demos since it won't flood InterSystmes IRIS with messages while you are speaking and explaining things. But if you want to show more speed, try increasing the batch size to 1000. The simulator will show a much higher ingestion rate.
+You will be able to pick a ticket for yourself. Then you can find the problematic message trace and look at what happend. Then you can add that country back to the lookup table and use the workflow UI to retry processing the message. You will see that, this time, the message will go through. The message trace will show the entire history of the event. This can be stored for many months and years for forensics.
 
 # Other demo applications
 

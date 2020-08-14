@@ -13,6 +13,12 @@ Property %DateReceived As %TimeStamp(%JSONINCLUDE = "none") [ InitialExpression 
 
 Index ProcessingStatusIndex On %ProcessingStatus;
 
+Method ChangeStatus(pNewStatus As %String) As %Status
+{
+    Set ..%ProcessingStatus=pNewStatus
+    Quit ..%Save()
+}
+
 ClassMethod ParseJSONAndSave(pJSONString As %String) As %Status
 {
     Set tSC = $$$OK

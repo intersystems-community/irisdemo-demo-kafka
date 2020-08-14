@@ -45,8 +45,15 @@ Vailable SerDes:
 - https://docs.confluent.io/current/streams/developer-guide/datatypes.html
 
 
+# Get a report of the processing status
 
-Get a customer with many movements
+SELECT 
+ %ProcessingStatus, count(ID) 
+FROM corebanking.AllObjects
+group by  %ProcessingStatus 
+
+
+# Get a customer with many movements
 
 select Account->AccountNumber, count(ID) as movements
 
@@ -56,7 +63,7 @@ group by Account->AccountNumber
 order by movements desc
 
 
-Get a customer with movements that include loans:
+# Get a customer with movements that include loans:
 
 select mov.Account->AccountNumber, count(mov.ID) as movements
 
@@ -69,7 +76,7 @@ order by movements desc
 
 
 
-Get a Customer's balance
+# Get a Customer's balance
 
 select cust.FullName, cust.CheckingAccount->AccountNumber, cust.CheckingAccount->OpeningBalance, mov.MovementDate, mov.MovementType, mov.LoanContract, mov.Reference, mov.TransferId, mov.Amount, mov.AccountBalance
 
@@ -79,3 +86,10 @@ where mov.Account= cust.CheckingAccount
 
 and mov.Account->AccountNumber= '0022678' 
 order by mov.MovementDate
+
+
+# Opening the original and the canonical data using REST:
+
+http://127.0.0.1:10001/csp/appint/rest/data/corebanking.com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/2
+
+http://127.0.0.1:10001/csp/appint/rest/data/Canonical.Customer/2

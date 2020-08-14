@@ -57,10 +57,15 @@ XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 		{
 			Set tObjectDump=normalizedRequest.GetObjectDump()
 			$$$LOGERROR(tObjectDump)
+
+			Set status2 = request.ChangeStatus("ERR")
+			If $$$ISERR(status2) Set status = $System.Status.AppendStatus(status, status2)
 			Quit
 		}
 		
 		Set context.NormalizedData=normalizedRequest
+
+		Set status = request.ChangeStatus("DONE")
 	]]>
 	</code>
 	<assign name="Done" property="context.Action" value="&quot;Done&quot;" action="set" xpos='200' ypos='450' />
@@ -89,6 +94,7 @@ XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 	</true>
 	<false>
 	<trace name='Specialist asked to discard' value='"Specialist asked to discard"' xpos='200' ypos='900' />
+	<assign name='Discarding' property='status' value='request.ChangeStatus("DISC")'/>
 	</false>
 	</if>
 	</catchall>

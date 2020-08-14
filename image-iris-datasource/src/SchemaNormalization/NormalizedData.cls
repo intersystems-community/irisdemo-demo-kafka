@@ -90,10 +90,10 @@ Method GetObjectDump() As %String
     Set ret=""
     While 'file.AtEnd
     {
-        Set ret=ret_file.Read()
+        Set ret=ret_file.ReadLine()_$C(13,10)
     }
     
-    Quit "<pre>"_ret_"</pre>"
+    Quit ret
 }
 
 }

@@ -22,7 +22,7 @@ XData UrlMap
 </Routes>
 }
 
-/// Example http://127.0.0.1:10001/csp/appint/rest/data/com.irisdemo.banksim.avroevent.V1.DemographicsAvroEvent/2
+/// Example http://127.0.0.1:10001/csp/appint/rest/data/corebanking.com.irisdemo.banksim.avroevent.NewCustomerAvroEvent/2
 ClassMethod Get(pClassName As %String, pID As %String) As %Status
 {
 	Set ^t(pClassName)=pID
