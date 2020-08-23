@@ -18,7 +18,7 @@ XData DTL [ XMLNamespace = "http://www.intersystems.com/dtl" ]
 <assign value='source.transferType' property='target.MovementType' action='set' />
 <assign value='source.reference' property='target.Reference' action='set' />
 <assign value='target.Account.Balance+source.amount' property='target.Account.Balance' action='set' />
-<assign value='target.Account.Balance' property='target.AccountBalance' action='set' />
+<assign value='target.Account.Balance' property='target.RollingBalance' action='set' />
 <switch >
 <case condition='source.transferType="LOAN_PAYMENT_OUT"' >
 <annotation>If this customer is paying an installment for a loan, we want this entry to reference that loan contract</annotation>

@@ -268,10 +268,10 @@ group by mov.Account->AccountNumber
 order by movements desc
 ```
 
-#### Get a Customer's checking account balance
+#### Get a Customer's checking account rolling balance
 
 ```SQL
-select cust.FullName, cust.CheckingAccount->AccountNumber, cust.CheckingAccount->OpeningBalance, mov.MovementDate, mov.MovementType, mov.LoanContract, mov.Reference, mov.TransferId, mov.Amount, mov.AccountBalance
+select cust.FullName, cust.CheckingAccount->AccountNumber, cust.CheckingAccount->OpeningBalance, mov.MovementDate, mov.MovementType, mov.LoanContract, mov.Reference, mov.TransferId, mov.Amount, mov.RollingBalance
 from Canonical.CheckingAccountMov mov, Canonical.Customer cust
 where mov.Account= cust.CheckingAccount
 and mov.Account->AccountNumber= '0022678' 

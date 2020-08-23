@@ -11,7 +11,7 @@ Property OtherAccount As CheckingAccount [ Required ];
 
 Property Account As CheckingAccount [ Required ];
 
-Property AccountBalance As %Double;
+Property RollingBalance As %Double;
 
 Property MovementType As %String [ Required ];
 
@@ -47,7 +47,7 @@ Storage Default
 <Value>Account</Value>
 </Value>
 <Value name="7">
-<Value>AccountBalance</Value>
+<Value>RollingBalance</Value>
 </Value>
 <Value name="8">
 <Value>MovementType</Value>
