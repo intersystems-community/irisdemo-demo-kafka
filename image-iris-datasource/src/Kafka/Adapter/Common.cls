@@ -37,7 +37,6 @@ Method OnInit() As %Status
     Do ..AddRemoteSetting("BOOTSTRAP_SERVERS", ..KafkaBrokerURL)
     Do ..AddRemoteSetting("GROUP_ID", ..GroupId)
     Do ..AddRemoteSetting("AUTO_OFFSET_RESET_CONFIG", ..AutoOffsetResetConfig)
-    Do ..AddRemoteSetting("CALL_INTERVAL", ..CallInterval)
 
 	Quit ##super()
 }
