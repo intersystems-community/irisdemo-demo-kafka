@@ -1,6 +1,8 @@
 Class corebanking.AllObjects Extends (%Persistent, SchemaNormalization.OriginalData) [ Inheritance = left, ProcedureBlock ]
 {
 
+Index ProcessingStatusIndex On %ProcessingStatus;
+
 Storage Default
 {
 <Data name="AllObjectsDefaultData">

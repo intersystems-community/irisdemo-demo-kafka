@@ -61,6 +61,12 @@ ClassMethod CreateBaseClassIfItDoesNotExist(pBaseClassName) As %Status
             Set oClassDef.Inheritance="left"
             Set oClassDef.ProcedureBlock=1
 
+            //Index ProcessingStatusIndex On %ProcessingStatus;
+            Set oIndex = ##class(%Dictionary.IndexDefinition).%New()
+            Set oIndex.Name="ProcessingStatusIndex"
+            Set oIndex.Properties="%ProcessingStatus"
+            Do oClassDef.Indices.Insert(oIndex)
+
             Set tSC = oClassDef.%Save()
             Quit:$$$ISERR(tSC)
 
