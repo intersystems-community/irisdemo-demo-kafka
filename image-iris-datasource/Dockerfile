@@ -1,5 +1,9 @@
 FROM intersystemsdc/irisdemo-base-irisint-community:version-1.9.0
 
+# IRIS Global buffers and Routine Buffers
+ENV IRIS_GLOBAL_BUFFERS=1024
+ENV IRIS_ROUTINE_BUFFERS=64
+
 # Name of the project folder ex.: my-atelier-project
 #ARG IRIS_PROJECT_FOLDER_NAME=iris-opcua-oee
 ARG IRIS_PROJECT_FOLDER_NAME=src 
