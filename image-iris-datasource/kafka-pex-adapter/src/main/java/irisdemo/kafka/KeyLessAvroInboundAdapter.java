@@ -19,7 +19,7 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 	Thread consumerThread = null;
 	boolean keepRunning = true;
 
-	private Consumer<Object, GenericRecord> consumer;
+	private Consumer<Object, GenericRecord> consumer = null;
 
 	public static String TOPIC;
 	public static String BOOTSTRAP_SERVERS;
@@ -30,11 +30,6 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 	public static String AUTO_OFFSET_RESET_CONFIG;
 	public static String STORAGE_BASE_PACKAGE_NAME;
 	public static int CALL_INTERVAL = 5;
-
-	// Used inside run() method
-	private static boolean succesfulDeserializationOfBatch = true;
-	private static Exception thrownExceptionDuringDeserialization;
-	private boolean newDataHasArrived = true;
 
 	private static Hashtable<String, String> schemaToClassNameMap = new Hashtable<String, String>();
 
@@ -72,8 +67,11 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 	}
 
 	@Override
-	public void OnInit() throws Exception {
+	public void OnInit() throws Exception 
+	{
+		this.LOGINFO("OnInit - Creating Kafka consummer...");
 		this.consumer = createConsumer();
+		this.LOGINFO("Kafka consumer created.");
 	}
 
 	private String getClassNameForSchema(org.apache.avro.Schema schema) {
@@ -92,7 +90,6 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 		}
 
 		return className;
-
 	}
 
 	@Override
@@ -101,24 +98,15 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 		ConsumerRecords<Object, GenericRecord> consumerRecords;
 		ConsumerRecord<Object, GenericRecord> record = null;
 		GenericRecord data;
+		long offset;
+		int partition;
 
-		IRISList list = new IRISList();
-		
-
-		consumerRecords = consumer.poll(Duration.ofMillis(1000));
-
-		// LOGINFO("Returned " + consumerRecords.count() + " records.");
-
-		succesfulDeserializationOfBatch = true;
-
-		// BusinessHost.irisHandle.iris.tStart();
 		try 
-		{
-			// This will not prevent duplicated records in IRIS.
-			// That is why the Business Process that is processing
-			// these records must implement guarantees to detect and discard duplicated
-			// messages.
-
+		{	
+			IRISList list = new IRISList();
+			
+			consumerRecords = this.consumer.poll(Duration.ofMillis(1000));
+		
 			Iterator iterator = consumerRecords.iterator();
 
 			while (iterator.hasNext())
@@ -126,9 +114,13 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 				record = (ConsumerRecord<Object, GenericRecord>) iterator.next();
 
 				data = (GenericRecord) record.value();
+				offset = record.offset();
+				partition = record.partition();
 
 				String className = getClassNameForSchema(data.getSchema());
 
+				list.add(partition);
+				list.add(offset);
 				list.add(className);
 				list.add(data.toString());
 				BusinessHost.ProcessInput(list);

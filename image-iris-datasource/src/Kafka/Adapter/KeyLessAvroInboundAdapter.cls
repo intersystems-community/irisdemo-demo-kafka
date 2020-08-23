@@ -26,6 +26,8 @@ Parameter SETTINGS = "SchemaRegistryConfig:Basic:selector?context={SchemaRegistr
 
 Method OnInit() As %Status
 {
+    $$$LOGINFO("KeyLessAvroInboundAdapter.OnInit()")
+    
     Do ..AddRemoteSetting("SCHEMA_REGISTRY", ..SchemaRegistryConfigObj.EndPoint)
     Do ..AddRemoteSetting("CALL_PROCESS_INPUT_UPON_NEW_DATA", ..CallProcessInputUponNewData)
     Do ..AddRemoteSetting("KEY_DESERIALIZER_CLASS_CONFIG", ..KeyDeserializerClassName)

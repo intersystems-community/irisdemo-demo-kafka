@@ -31,12 +31,25 @@ Parameter SETTINGS = "-%remoteClassname,-%remoteSettings,-%gatewayExtraClasspath
 
 Method OnInit() As %Status
 {
+    $$$LOGINFO("Common.OnInit()")
+
     Do ..AddRemoteSetting("TOPIC", ..Topic)
     Do ..AddRemoteSetting("BOOTSTRAP_SERVERS", ..KafkaBrokerURL)
     Do ..AddRemoteSetting("GROUP_ID", ..GroupId)
     Do ..AddRemoteSetting("AUTO_OFFSET_RESET_CONFIG", ..AutoOffsetResetConfig)
     Do ..AddRemoteSetting("CALL_INTERVAL", ..CallInterval)
+
 	Quit ##super()
+}
+
+Method KafkaOffsetAlreadyCommitted(pPartition As %Integer, pOffSet As %BigInt) As %Boolean
+{
+    Return $Get($$$EnsStaticAppData(..BusinessHost.%ConfigName,"adapter.kafkaparam","LastOffSet",pPartition),-1)>=pOffSet
+}
+
+Method CommitKafkaOffset(pPartition As %Integer, pOffSet As %BigInt)
+{
+    Set $$$EnsStaticAppData(..BusinessHost.%ConfigName,"adapter.kafkaparam","LastOffSet", pPartition)=pOffSet
 }
 
 Method OnTask() As %Status
