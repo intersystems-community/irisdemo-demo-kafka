@@ -21,7 +21,7 @@ public class Config
 	*/
 	private boolean startConsumers;
 	private String title;
-	private int maxTimeToRunInSeconds = 300;
+	private int maxTimeToRunInSeconds;
 	private int numberOfActiveIngestionThreads;
 	private String kafkaBootstrapServersConfig;
 	private String schemaRegistryURLConfig;
@@ -71,6 +71,7 @@ public class Config
 		return maxTimeToRunInSeconds;
 	}
 
+	@Value( "${SIMULATION_MAX_TIME_RUN:300}" )
 	public void setMaxTimeToRunInSeconds(int maxTimeToRunInSeconds)
 	{
 		this.maxTimeToRunInSeconds=maxTimeToRunInSeconds;
