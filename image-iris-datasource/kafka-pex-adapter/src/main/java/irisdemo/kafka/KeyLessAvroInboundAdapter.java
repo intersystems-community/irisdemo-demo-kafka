@@ -29,7 +29,6 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 	public static boolean CALL_PROCESS_INPUT_UPON_NEW_DATA = false;
 	public static String AUTO_OFFSET_RESET_CONFIG;
 	public static String STORAGE_BASE_PACKAGE_NAME;
-	public static int CALL_INTERVAL = 5;
 
 	private static Hashtable<String, String> schemaToClassNameMap = new Hashtable<String, String>();
 

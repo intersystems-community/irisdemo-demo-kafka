@@ -35,6 +35,8 @@ Parameter SETTINGS = "KeyDeserializerClassName:Basic,ValueDeserializerClassName:
 
 Method OnInit() As %Status
 {
+    Do ..AddRemoteSetting("CALL_INTERVAL", ..CallInterval)
+    
     Do ..AddRemoteSetting("CALL_PROCESS_INPUT_UPON_NEW_DATA", ..CallProcessInputUponNewData)
 
     Do ..AddRemoteSetting("KEY_DESERIALIZER_CLASS_CONFIG", ..KeyDeserializerClassName)

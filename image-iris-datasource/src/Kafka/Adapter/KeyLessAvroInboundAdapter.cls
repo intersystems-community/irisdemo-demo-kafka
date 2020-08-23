@@ -22,7 +22,10 @@ Property SchemaRegistryConfig As %String;
 
 Property SchemaRegistryConfigObj As SchemaRegistry.Config;
 
-Parameter SETTINGS = "SchemaRegistryConfig:Basic:selector?context={SchemaRegistry.Monitor.ContextSearch/Configs},KeyDeserializerClassName";
+/// We are hiding CallInterval and letting it be 5 seconds (its default value). We are not actually waiting 5 seconds
+/// inbetween calls to OnTask. OnTask is being called on a tight loop. We will only wait 5 seconds when an error occurrs. 
+/// We will wait 5sec before trying again.
+Parameter SETTINGS = "-CallInterval,SchemaRegistryConfig:Basic:selector?context={SchemaRegistry.Monitor.ContextSearch/Configs},KeyDeserializerClassName";
 
 Method OnInit() As %Status
 {
