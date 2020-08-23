@@ -28,6 +28,7 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="KafkaBrokerURL">http://broker:9092</Setting>
     <Setting Target="Adapter" Name="SchemaRegistryConfig">corebanking</Setting>
     <Setting Target="Adapter" Name="Topic">core-banking-system-events</Setting>
+    <Setting Target="Host" Name="ThrottleDelay">100</Setting>
   </Item>
   <Item Name="Core Banking Normalization Service" Category="" ClassName="SchemaNormalization.Service" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="SchemaRegistryConfig">corebanking</Setting>
