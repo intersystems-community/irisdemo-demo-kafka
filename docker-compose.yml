@@ -23,15 +23,16 @@ services:
       - "10002:8080" # Where Springboot Will be listening
     environment:
       - MASTER_SPEEDTEST_TITLE=InterSystems IRIS Kafka Demo with AVRO
-      - PRODUCER_THROTTLING=100
+      - PRODUCER_THROTTLING=500
       - START_CONSUMERS=false
-      - PRODUCER_FLUSH_SIZE=1000
+      - PRODUCER_FLUSH_SIZE=500
       - PRODUCER_THREADS_PER_WORKER=1
       - KAFKA_BOOTSTRAP_SERVERS_CONFIG=http://broker:29092
       - KAFKA_SCHEMA_REGISTRY_URL_CONFIG=http://schema-registry:8081
       - BANKSIM_NUM_DAYS=700
       - BANKSIM_NUM_EVENTS=3500000
       - BANKSIM_NUM_CUSTOMERS=50000
+      - SIMULATION_MAX_TIME_RUN=1200
 
   ui:
     depends_on:

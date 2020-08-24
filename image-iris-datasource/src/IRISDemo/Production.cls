@@ -25,16 +25,16 @@ XData ProductionDefinition
   <Item Name="Core Banking Kafka Events" Category="" ClassName="Kafka.Service.KeyLessAvroService" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Adapter" Name="%gatewayPort">55555</Setting>
     <Setting Target="Adapter" Name="AutoOffsetResetConfig">earliest</Setting>
-    <Setting Target="Adapter" Name="KafkaBrokerURL">http://broker:9092</Setting>
+    <Setting Target="Adapter" Name="KafkaBrokerURL">http://broker:9092</Setting> 
     <Setting Target="Adapter" Name="SchemaRegistryConfig">corebanking</Setting>
     <Setting Target="Adapter" Name="Topic">core-banking-system-events</Setting>
-    <Setting Target="Host" Name="ThrottleDelay">100</Setting>
+    <Setting Target="Host" Name="ThrottleDelay">300</Setting>
   </Item>
   <Item Name="Core Banking Normalization Service" Category="" ClassName="SchemaNormalization.Service" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="SchemaRegistryConfig">corebanking</Setting>
     <Setting Target="Host" Name="TargetConfigName">Schema Normalization Process</Setting>
     <Setting Target="Host" Name="BatchSize">1000</Setting>
-    <Setting Target="Adapter" Name="CallInterval">1</Setting>
+    <Setting Target="Adapter" Name="CallInterval">0.1</Setting>
   </Item>
 </Production>
 }
