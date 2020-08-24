@@ -1,2 +1,9 @@
+## 1.5.0 (August 23, 2020)
+  - Configuring throttling to better align Kafka with IRIS and save resources
+  - Giving more memory to IRIS
+  - Making simulation time to run a configurable property through env var
+  - Adding support for offset duplication detection so we don't process the same message twice
+  - Renaming AccountBalance to RollingBalance on canonical movement
+
 ## 1.4.3 (August 14, 2020)
   - Initial version
