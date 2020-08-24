@@ -38,7 +38,8 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 		// We want to drive the commits. We will only commit to Kafka if we have saved
 		// the records in IRIS, not before.
 		props.put("enable.auto.commit", Boolean.toString(false));
-		// props.put("max.poll.records", 1);
+		props.put("max.poll.records", 500);
+		props.put("max.poll.interval.ms", 300000);
 
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
@@ -134,7 +135,7 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 		}
 		catch (Exception e)
 		{
-			LOGERROR("OnTask Exception: " + e.getMessage() + "\n" + e.getStackTrace());
+			LOGERROR("OnTask Exception: " + e.getMessage() + "\n" + e.getStackTrace().toString());
 			throw e;
 		}
 	}
