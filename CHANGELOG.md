@@ -1,3 +1,6 @@
+## 1.5.1 (August 24, 2020)
+  - Using latest version of banksim
+
 ## 1.5.0 (August 23, 2020)
   - Configuring throttling to better align Kafka with IRIS and save resources
   - Giving more memory to IRIS
