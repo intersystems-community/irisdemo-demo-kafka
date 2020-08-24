@@ -261,22 +261,23 @@ order by movements desc
 #### Find customers that have many bank transactions and has loans
 
 ```SQL
-select mov.Account->AccountNumber, count(mov.ID) as movements
-from Canonical.CheckingAccountMov mov, Canonical.LoanContract loan
-where mov.Account->Customer = loan.Customer
-group by mov.Account->AccountNumber
+select Account->AccountNumber, count(ID) as movements
+from Canonical.CheckingAccountMov
+where LoanContract is not null
+group by Account->AccountNumber
 order by movements desc
 ```
 
 #### Get a Customer's checking account rolling balance
 
 ```SQL
-select cust.FullName, cust.CheckingAccount->AccountNumber, cust.CheckingAccount->OpeningBalance, mov.MovementDate, mov.MovementType, mov.LoanContract, mov.Reference, mov.TransferId, mov.Amount, mov.RollingBalance
-from Canonical.CheckingAccountMov mov, Canonical.Customer cust
-where mov.Account= cust.CheckingAccount
-and mov.Account->AccountNumber= '0022678' 
-order by mov.MovementDate
+select Account->Customer->FullName, Account->AccountNumber, Account->OpeningBalance, MovementDate, MovementType, LoanContract, Reference, TransferId, Amount, RollingBalance
+from Canonical.CheckingAccountMov 
+where Account->AccountNumber= '0000107' 
+order by MovementDate
 ```
+
+Please notice that this query shows a very useful SQL extension provided by InterSystems IRIS. This could have been a very complex query, joining three different tables (CheckingAccountMov, Customer and CheckingAccount). Instead, we can focus on the CheckingAccountMov table and just use the arrow syntach (->) to navigate to the other tables and write a much simpler query.
 
 ## Human Workflow
 
