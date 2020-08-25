@@ -1,3 +1,9 @@
+## 1.5.2 (August 24, 2020)
+  - Adding Loan Cube
+  - Making sure we are using known kafka consumer parameters
+  - Providing better SQL queries on the README
+  - Using latest version of bank sim
+
 ## 1.5.1 (August 24, 2020)
   - Using latest version of banksim
 
