@@ -1,5 +1,7 @@
 # InterSystems IRIS Data Ingestion and Schema Evolution Example
 
+See a [video](https://youtu.be/3iKMHGlTwzE) of this demo!
+
 Demo of InterSystems IRIS with Kafka, Schema Registry, AVRO and Schema Migration
 
 This demo allows you to show:
