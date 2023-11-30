@@ -105,7 +105,7 @@ public class KeyLessAvroInboundAdapter extends com.intersystems.enslib.pex.Inbou
 		{	
 			IRISList list = new IRISList();
 			
-			consumerRecords = this.consumer.poll(Duration.ofMillis(1000));
+			consumerRecords = this.consumer.poll(Duration.ofMillis(500));
 		
 			Iterator iterator = consumerRecords.iterator();
 

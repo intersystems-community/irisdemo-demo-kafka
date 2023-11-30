@@ -1,4 +1,4 @@
-FROM intersystemsdc/irisdemo-base-irisint-community:version-1.9.0
+FROM intersystemsdc/irisdemo-base-irisint-community:version-1.11.0
 
 # IRIS Global buffers and Routine Buffers
 ENV IRIS_GLOBAL_BUFFERS=1024
@@ -15,7 +15,7 @@ ADD --chown=irisowner:irisuser ./us_states.json /tmp/
 ADD --chown=irisowner:irisuser ./kafka-pex-adapter.jar /kafka/kafka-pex-adapter.jar
 
 # Running the installer. This will load the source from our project.
-RUN /usr/irissys/demo/irisdemoinstaller.sh 
+RUN /demo/irisdemoinstaller.sh 
 
 ADD --chown=irisowner:irisuser ./html/landing-page.png $ISC_PACKAGE_INSTALLDIR/csp/appint/
 ADD --chown=irisowner:irisuser ./html/image-map-resizer/js/imageMapResizer.min.js $ISC_PACKAGE_INSTALLDIR/csp/appint/

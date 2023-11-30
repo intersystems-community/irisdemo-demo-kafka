@@ -11,6 +11,10 @@ cd ..
 echo "kafka-pex-adapter jar file built!"
 echo "Building iris-datasource image now..."
 
+find . -name .project -delete
+find . -name .buildpath -delete
+find . -name .settings -type d -exec rm -rf {} +
+
 VERSION=`cat ../VERSION`
 DOCKER_TAG="version-${VERSION}"
 

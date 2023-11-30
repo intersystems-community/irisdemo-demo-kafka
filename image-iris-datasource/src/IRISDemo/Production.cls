@@ -39,4 +39,54 @@ XData ProductionDefinition
 </Production>
 }
 
+ClassMethod OnStart(pTimeStarted As %String) As %Status
+{
+    // Stopping journaling system wide to speed up the demo
+    Set tSC = ##class(%SYS.Journal.System).Stop() 
+    If $$$ISERR(tSC) 
+    {   
+        // Was it already stopped? Good! Keep going...
+        If $System.Status.GetErrorCodes(tSC)=1141 Set tSC = $$$OK   //ERROR #1141: Error stopping journaling: -3,Not journaling
+
+        // Some other problem? Alright... Let's report it.
+        Quit tSC
+    }
+
+    #; Set tSC = ##class(%DeepSee.CubeManager.Utils).SetActiveRegistry("Cube.Registry")
+    #; Quit:$$$ISERR(tSC) tSC
+
+    #; Set tSC = ##class(%DeepSee.CubeManager.Utils).BuildAllRegisteredGroups()
+    #; Quit:$$$ISERR(tSC) tSC
+
+    // To work with Community, it must be < 10240 (10Gb)
+    Quit ..ExpandDB(10000)
+}
+
+ClassMethod ExpandDB(pSizeInMb As %Integer)
+{
+    Set tSC = $$$OK 
+    Set tNS = $Namespace 
+    Try 
+    { 
+      Set $Namespace="%SYS" 
+      Set tSC = ##class(Config.Databases).Get("APPINT", .properties)
+      Quit:$$$ISERR(tSC)
+      
+      Set dir=properties("Directory")
+      Set db=##class(SYS.Database).%OpenId(dir,,.tSC)
+      Quit:$$$ISERR(tSC)
+      Set db.Size=pSizeInMb 
+      Set tSC = db.%Save()
+      
+    } 
+    Catch (oException) 
+    { 
+      Set tSC = oException.AsStatus() 
+    }
+
+    Set $Namespace=tNS 
+
+    Quit tSC
+}
+
 }

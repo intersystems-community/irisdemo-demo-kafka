@@ -3,6 +3,10 @@ Class Kafka.Service.KeyLessAvroService Extends Ens.BusinessService
 
 Parameter ADAPTER = "Kafka.Adapter.KeyLessAvroInboundAdapter";
 
+Property DisableTransactionSupport As %Boolean [ InitialExpression = 1 ];
+
+Parameter SETTINGS = "DisableTransactionSupport";
+
 Method OnProcessInput(pInput As %RegisteredObject, Output pOutput As %RegisteredObject, pHint As %String) As %Status
 {
     Set tSC = $$$OK
@@ -31,14 +35,14 @@ Method OnProcessInput(pInput As %RegisteredObject, Output pOutput As %Registered
         
         // We need to start a transaction in order to make sure we are saving the object as 
         // well as recording the last offset read from the partition as a single unit of work
-        TStart
+        TStart:'..DisableTransactionSupport
         
         Set tSC = $classmethod(tClassName, "ParseJSONAndSave", tJSON)
         Quit:$$$ISERR(tSC)
 
         Do ..Adapter.CommitKafkaOffset(tPartition, tOffSet)
 
-        TCommit
+        TCommit:'..DisableTransactionSupport
     } 
     Catch (oException)
     {

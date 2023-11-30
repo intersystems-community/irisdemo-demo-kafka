@@ -1,3 +1,6 @@
+## 1.6.0 (November 29, 2023)
+  - Update README.md
+
 ## 1.5.2 (August 24, 2020)
   - Adding Loan Cube
   - Making sure we are using known kafka consumer parameters
